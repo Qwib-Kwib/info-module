@@ -19,6 +19,7 @@ using MySql.Data.MySqlClient;
 
 namespace Info_module.Pages.TableMenus
 {
+    /// newwwwwwwwwwwwwwwwwwwwww
     /// <summary>
     /// Interaction logic for DepartmentMenu.xaml
     /// </summary>
