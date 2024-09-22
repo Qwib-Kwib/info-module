@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Frame x:Name="TopBarFrame" Content="" NavigationUIVisibility="Hidden"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
-            <Viewbox Stretch="Fill" StretchDirection="UpOnly" MaxWidth="1000">
+            <Viewbox StretchDirection="UpOnly" MaxWidth="1140">
                 <Grid Background="White" Height="602" Width="760">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="65*"/>
@@ -32,21 +32,22 @@
                                 <TextBox x:Name="firstName_txt" HorizontalAlignment="Left" Margin="13,25,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20"/>
                                 <TextBox x:Name="middleName_txt" HorizontalAlignment="Left" Margin="14,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20"/>
                                 <TextBox x:Name="employment_txt" HorizontalAlignment="Left" Margin="139,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20"/>
-                                <TextBox x:Name="email_txt" HorizontalAlignment="Left" Margin="14,147,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20"/>
+                                <TextBox x:Name="email_txt" HorizontalAlignment="Left" Margin="14,159,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="180" Height="20"/>
                                 <TextBox x:Name="lastName_txt" HorizontalAlignment="Left" Margin="14,107,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20"/>
                                 <TextBlock HorizontalAlignment="Left" Margin="139,9,0,0" TextWrapping="Wrap" Text="Employee ID:" VerticalAlignment="Top"/>
                                 <TextBlock HorizontalAlignment="Left" Margin="14,9,0,0" TextWrapping="Wrap" Text="First Name:" VerticalAlignment="Top"/>
                                 <TextBlock HorizontalAlignment="Left" Margin="14,49,0,0" TextWrapping="Wrap" Text="Middle Name:" VerticalAlignment="Top"/>
                                 <TextBlock HorizontalAlignment="Left" Margin="14,91,0,0" TextWrapping="Wrap" Text="Last Name:" VerticalAlignment="Top"/>
                                 <TextBlock HorizontalAlignment="Left" Margin="139,49,0,0" TextWrapping="Wrap" Text="Employee Type:" VerticalAlignment="Top" Width="91"/>
-                                <TextBlock HorizontalAlignment="Left" Margin="14,131,0,0" TextWrapping="Wrap" Text="Email:" VerticalAlignment="Top" Width="91"/>
-                                <RadioButton x:Name="male_rbtn" Content="Male" HorizontalAlignment="Left" Margin="140,119,0,0" VerticalAlignment="Top" Width="70"/>
-                                <RadioButton x:Name="female_rbtn" Content="Female" HorizontalAlignment="Left" Margin="139,139,0,0" VerticalAlignment="Top" Width="70"/>
-                                <TextBlock HorizontalAlignment="Left" Margin="140,98,0,0" TextWrapping="Wrap" Text="Sex:" VerticalAlignment="Top" Width="30"/>
+                                <TextBlock HorizontalAlignment="Left" Margin="14,139,0,0" TextWrapping="Wrap" Text="Email:" VerticalAlignment="Top" Width="91"/>
+                                <RadioButton x:Name="male_rbtn" Content="Male" HorizontalAlignment="Left" Margin="139,107,0,0" VerticalAlignment="Top" Width="55" Height="16"/>
+                                <RadioButton x:Name="female_rbtn" Content="Female" HorizontalAlignment="Left" Margin="194,107,0,0" VerticalAlignment="Top" Width="55" FontSize="11" Height="16"/>
+                                <TextBlock HorizontalAlignment="Left" Margin="139,91,0,0" TextWrapping="Wrap" Text="Sex:" VerticalAlignment="Top" Width="30"/>
                                 <Button x:Name="instructorAdd_btn" Content="Add" Margin="19,201,167,88" Width="65" Height="20" Click="instructorAdd_btn_Click"/>
                                 <Button x:Name="instructorEdit_btn" Content="Save" Margin="95,201,95,88" Width="65" Height="20" Click="instructorSave_btn_Click"/>
-                                <Button x:Name="instructorRemove_btn" Content="Deactivate" Margin="171,201,19,88" Width="65" Height="20" Click="instructorStatus_btn_Click"/>
+                                <Button x:Name="instructorStatus_btn" Content="Deactivate" Margin="171,201,19,88" Width="65" Height="20" Click="instructorStatus_btn_Click"/>
                                 <Button x:Name="btnInstrutorCSV" Content="Upload CSV" Margin="80,235,80,54" Click="btnInstrutorCSV_Click" Height="20" Width="95"/>
+                                <CheckBox x:Name="disability_ckbox" Content="Disability" HorizontalAlignment="Left" Margin="139,132,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.479,0.734"/>
                             </Grid>
                         </Viewbox>
                         <Grid Grid.Column="1">
@@ -54,24 +55,26 @@
                                 <RowDefinition Height="15*"/>
                                 <RowDefinition Height="85*"/>
                             </Grid.RowDefinitions>
-                            <Viewbox Margin="10,10,10,10" Grid.Row="1" Stretch="Fill">
-                                <Viewbox Height="228" Stretch="Fill" Width="588" >
-                                    <DataGrid x:Name="instructor_data" AutoGenerateColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionChanged="instructor_data_SelectionChanged" Height="381" Width="800" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Internal_Employee_Id" Visibility="Hidden"/>
-                                            <DataGridTextColumn Header="Employee Id" Binding="{Binding Employee_Id}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Department" Binding="{Binding Department}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Middle Name" Binding="{Binding MiddleName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Employment" Binding="{Binding Employment}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Disability" Binding="{Binding Disability}" IsReadOnly="True"/>
+                            <Viewbox Margin="5,5,5,45" Grid.Row="1" Stretch="Fill">
+                                <DataGrid x:Name="instructor_data" AutoGenerateColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionChanged="instructor_data_SelectionChanged" Height="367" Width="825" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <DataGrid.Columns>
+                                        <!-- Hidden column for Internal_Employee_Id -->
+                                        <DataGridTextColumn Header="Internal_Employee_Id" Binding="{Binding Internal_Employee_Id}" Visibility="Hidden"/>
 
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Viewbox>
+                                        <!-- Visible columns bound to respective fields -->
+                                        <DataGridTextColumn Header="Employee Id" Binding="{Binding Employee_Id}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding Department}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Middle Name" Binding="{Binding MiddleName}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Employment" Binding="{Binding Employment}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Disability" Binding="{Binding Disability}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" IsReadOnly="True"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
                             </Viewbox>
                             <Viewbox VerticalAlignment="Center" Height="25" Width="482" HorizontalAlignment="Left" Margin="10,2,0,2" Stretch="Fill">
                                 <TextBlock x:Name="collegeName_txt" TextWrapping="Wrap" Text="{Binding CollegeName}" FontSize="22" FontWeight="Bold" FontFamily="Copperplate Gothic Bold" Height="25" Width="482"/>
@@ -93,14 +96,16 @@
                                 <ColumnDefinition Width="0*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <DataGrid x:Name="availability_data" Margin="10,5,10,5" Grid.ColumnSpan="2" Grid.Row="1" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="ID" IsReadOnly="True" Binding="{Binding Availability_Id}" Visibility="Hidden"/>
-                                    <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Day of Week" IsReadOnly="True" Binding="{Binding Day_Of_Week}"/>
-                                    <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Start Time" IsReadOnly="True" Binding="{Binding Start_Time}"/>
-                                    <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="End Time" IsReadOnly="True" Binding="{Binding End_Time}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Viewbox Margin="10,5,11,10" Grid.ColumnSpan="2" Grid.Row="1" Stretch="Fill">
+                                <DataGrid x:Name="availability_data" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Height="176" Width="531">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="ID" IsReadOnly="True" Binding="{Binding Availability_Id}" Visibility="Hidden"/>
+                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Day of Week" IsReadOnly="True" Binding="{Binding Day_Of_Week}"/>
+                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Start Time" IsReadOnly="True" Binding="{Binding Start_Time}"/>
+                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="End Time" IsReadOnly="True" Binding="{Binding End_Time}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Viewbox>
                             <TextBlock Margin="10,2,220,2" TextWrapping="Wrap" Text="Instructor Availability" FontSize="14" Grid.ColumnSpan="2"/>
                             <Grid Grid.Column="1" Grid.Row="2">
                                 <Grid.ColumnDefinitions>
@@ -141,7 +146,7 @@
                                 <RowDefinition Height="2.5*"/>
                             </Grid.RowDefinitions>
                             <Viewbox Margin="10,5,10,5" Grid.Row="1" Stretch="Fill">
-                                <DataGrid x:Name="instrutorSubject_data" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Height="143" Width="257">
+                                <DataGrid x:Name="instrutorSubject_data" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Height="179" Width="386">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="ID" IsReadOnly="True" Binding="{Binding Instructor_Subject_Id}" Visibility="Hidden"/>
                                         <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Subject Code" IsReadOnly="True" Binding="{Binding Subject_Code}"/>
@@ -157,6 +162,16 @@
                             <ComboBox x:Name="subjectCode_cmbx" ItemsSource="{Binding Subjects}" HorizontalAlignment="Left" Margin="102,8,0,0" Grid.Row="2" VerticalAlignment="Top" Width="153" RenderTransformOrigin="0.412,-0.05" Height="20" SelectionChanged="subjectCode_cmbx_SelectionChanged"/>
                         </Grid>
                     </Grid>
+                    <Viewbox Stretch="Fill" Margin="576,324,20,10">
+                        <Grid Height="22" Width="171">
+                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Show:" VerticalAlignment="Center" Height="22" Width="46" FontSize="16"/>
+                            <ComboBox x:Name="Status_cmb" Margin="51,0,0,0" VerticalAlignment="Center" SelectedIndex="0" SelectionChanged="Status_cmb_SelectionChanged">
+                                <ComboBoxItem Content="Active"/>
+                                <ComboBoxItem Content="Inactive"/>
+                                <ComboBoxItem Content="All"/>
+                            </ComboBox>
+                        </Grid>
+                    </Viewbox>
                 </Grid>
 
             </Viewbox>

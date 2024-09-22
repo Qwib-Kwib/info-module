@@ -97,9 +97,11 @@ namespace Info_module.Pages.TableMenus
                                 Room_Code, 
                                 Room_Floor AS Floor_Level, 
                                 Room_Type, 
-                                Room_Ac AS Air_Conditioned, 
                                 Max_Seat, 
-                                status AS Availability 
+                                CASE
+                                            When Status = 1 then 'Active'
+                                            Else 'Inactive'
+                                        End as 'Status' 
                              FROM rooms 
                              WHERE Building_Id = @BuildingId";
                     MySqlCommand command = new MySqlCommand(query, connection);
@@ -138,6 +140,7 @@ namespace Info_module.Pages.TableMenus
                     if (dataTable != null)
                     {
                         room_data.ItemsSource = dataTable.DefaultView;
+                        Cancel_btn.Visibility = Visibility.Visible;
                     }
                 }
                 catch (Exception ex)
@@ -322,9 +325,10 @@ namespace Info_module.Pages.TableMenus
             }
         }
 
-        private void ViewData_btn_Click(object sender, RoutedEventArgs e)
+        private void Cancel_btn_Click(object sender, RoutedEventArgs e)
         {
             LoadBuilding();
+            Cancel_btn.Visibility = Visibility.Hidden;
 
         }
 
@@ -357,7 +361,7 @@ namespace Info_module.Pages.TableMenus
                         }
                     }
                     MessageBox.Show("Status updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    ViewData_btn_Click(sender, e); // Refresh data after updating status
+                    Cancel_btn_Click(sender, e); // Refresh data after updating status
                 }
                 catch (MySqlException ex)
                 {
@@ -381,9 +385,10 @@ namespace Info_module.Pages.TableMenus
                 selectedFloorLevel = Convert.ToInt32(selectedRow["Floor_Level"]);
                 selectedRoomType = selectedRow["Room_Type"].ToString();
                 selectedMaxSeat = Convert.ToInt32(selectedRow["Max_Seat"]);
-                selectedAvailability = Convert.ToInt32(selectedRow["Availability"]);
+                string statusString = selectedRow["Status"].ToString();
+                selectedAvailability = statusString == "Active" ? 1 : 0;
 
-                
+
                 // roomCodeTextBox.Text = selectedRoomCode;
                 // floorLevelTextBox.Text = selectedFloorLevel.ToString();
                 // roomTypeTextBox.Text = selectedRoomType;

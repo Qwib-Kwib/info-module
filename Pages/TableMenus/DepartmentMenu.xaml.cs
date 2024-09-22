@@ -19,7 +19,6 @@ using MySql.Data.MySqlClient;
 
 namespace Info_module.Pages.TableMenus
 {
-    /// newwwwwwwwwwwwwwwwwwwwwww
     /// <summary>
     /// Interaction logic for DepartmentMenu.xaml
     /// </summary>
@@ -47,7 +46,7 @@ namespace Info_module.Pages.TableMenus
             mainWindow.MainFrame.Navigate(new MainMenu());
         }
 
-        private void LoadDepartmentsData()
+        private void LoadDepartmentsData(string statusFilter = "Active")
         {
             try
             {
@@ -55,16 +54,29 @@ namespace Info_module.Pages.TableMenus
                 {
                     connection.Open();
                     string query = @"
-                SELECT 
-                    d.Dept_Id AS 'Department_ID',
-                    d.Building_Id,
-                    b.Building_Code AS 'Building_Code',
-                    d.Dept_Code AS 'Department_Code',
-                    d.Dept_Name AS 'Department_Name',
-                    d.Status AS 'Status'
-                FROM departments d
-                INNER JOIN buildings b ON d.Building_Id = b.Building_Id
-                WHERE d.Status = 1";
+            SELECT 
+                d.Dept_Id AS 'Department_ID',
+                d.Building_Id,
+                b.Building_Code AS 'Building_Code',
+                d.Dept_Code AS 'Department_Code',
+                d.Dept_Name AS 'Department_Name',
+                CASE 
+                    WHEN d.Status = 1 THEN 'Active'
+                    ELSE 'Inactive'
+                END AS 'Status'
+            FROM departments d
+            INNER JOIN buildings b ON d.Building_Id = b.Building_Id";
+
+                    // Apply filter based on the status
+                    if (statusFilter == "Active")
+                    {
+                        query += " WHERE d.Status = 1";
+                    }
+                    else if (statusFilter == "Inactive")
+                    {
+                        query += " WHERE d.Status = 0";
+                    }
+                    // Otherwise, do not add a WHERE clause to show all
 
                     MySqlCommand command = new MySqlCommand(query, connection);
 
@@ -83,7 +95,34 @@ namespace Info_module.Pages.TableMenus
             }
         }
 
+        private void Status_cmb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Status_cmb.SelectedItem != null)
+            {
+                ComboBoxItem selectedItem = (ComboBoxItem)Status_cmb.SelectedItem;
+                string selectedStatus = selectedItem.Content.ToString();
 
+                // Pass the selected status to filter the data
+                LoadDepartmentsData(selectedStatus);
+
+                // Change button content based on the selected status
+                if (selectedStatus == "Active")
+                {
+                    statusDepartment_btn.Content = "Deactivate"; // For active departments
+                    statusDepartment_btn.FontSize = 12;
+                }
+                else if (selectedStatus == "Inactive")
+                {
+                    statusDepartment_btn.Content = "Activate"; // For inactive departments
+                    statusDepartment_btn.FontSize = 12;
+                }
+                else
+                {
+                    statusDepartment_btn.Content = "Switch Status"; // Default text for "All"
+                    statusDepartment_btn.FontSize = 8;
+                }
+            }
+        }
 
         private void PopulateBuildingCodes()
         {
@@ -285,7 +324,7 @@ namespace Info_module.Pages.TableMenus
                 MessageBox.Show("Please select a department to edit.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-        private void removeDepartment_btn_Click(object sender, RoutedEventArgs e)
+        private void statusDepartment_btn_Click(object sender, RoutedEventArgs e)
         {
             if (department_data.SelectedItem != null)
             {
@@ -294,15 +333,20 @@ namespace Info_module.Pages.TableMenus
                 if (selectedRow != null)
                 {
                     int departmentId = Convert.ToInt32(selectedRow["Department_ID"]);
+                    string currentStatus = selectedRow["Status"].ToString(); // Assuming "Status" column is displayed as "Active" or "Inactive"
+
+                    // Determine the new status value
+                    int newStatus = (currentStatus == "Active") ? 0 : 1; // Toggle status
 
                     try
                     {
                         using (MySqlConnection connection = new MySqlConnection(connectionString))
                         {
                             connection.Open();
-                            string query = "UPDATE departments SET Status = 0 WHERE Dept_Id = @Dept_Id";
+                            string query = "UPDATE departments SET Status = @NewStatus WHERE Dept_Id = @Dept_Id";
                             using (MySqlCommand command = new MySqlCommand(query, connection))
                             {
+                                command.Parameters.AddWithValue("@NewStatus", newStatus);
                                 command.Parameters.AddWithValue("@Dept_Id", departmentId);
                                 command.ExecuteNonQuery();
                             }
@@ -310,20 +354,22 @@ namespace Info_module.Pages.TableMenus
 
                         // Refresh departments data after update
                         LoadDepartmentsData(); // Assuming this method reloads department_data DataGrid
-                        MessageBox.Show("Department removed successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        string message = (newStatus == 0) ? "Department set to Inactive successfully." : "Department set to Active successfully.";
+                        MessageBox.Show(message, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (MySqlException ex)
                     {
-                        MessageBox.Show("Error removing department: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Error updating department status: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
             else
             {
-                MessageBox.Show("Please select a department to remove.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Please select a department to change its status.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-
         }
+
 
         private void clearDepartment_btn_Click(object sender, RoutedEventArgs e)
         {

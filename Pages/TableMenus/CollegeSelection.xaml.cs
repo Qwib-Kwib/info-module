@@ -95,7 +95,7 @@ namespace Info_module.Pages.TableMenus
 
             if (SourceButton == "Curriculum")
             {
-                nextPage = new CurriculumMenu(Department_Id);
+                nextPage = new CurriculumPage(Department_Id);
             }
             else if (SourceButton == "Instructor")
             {

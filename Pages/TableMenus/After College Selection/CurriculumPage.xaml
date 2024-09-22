@@ -1,11 +1,12 @@
-﻿<Page x:Class="Info_module.Pages.TableMenus.After_College_Selection.CurriculumMenu"
+﻿<Page x:Class="Info_module.Pages.TableMenus.After_College_Selection.CurriculumPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Info_module.Pages.TableMenus.After_College_Selection"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="CurriculumMenu" Background="Black">
+      Title="CurriculumPage">
 
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -83,7 +84,7 @@
                             <TextBox x:Name="yearEffectiveOut_txt" TextWrapping="Wrap" Height="20" Grid.Column="2"/>
                             <Rectangle Grid.Column="1" Stroke="Black" Margin="15,9,15,9" Fill="Black"/>
                         </Grid>
-                        <Button x:Name="status_btn" Content="Activate" Margin="181,168,14,0" VerticalAlignment="Top" Click="Status_btn_Click" Height="20" Width="60" Grid.Row="1"/>
+                        <Button x:Name="status_btn" Content="Switch Status" Margin="181,168,14,0" VerticalAlignment="Top" Click="Status_btn_Click" Height="20" Width="60" Grid.Row="1"/>
                     </Grid>
                 </Viewbox>
             </Viewbox>

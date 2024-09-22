@@ -48,17 +48,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             LoadSubjects();
         }
 
-        private bool IsTimeOrderValid(string startTime, string endTime)
-        {
-            // Convert times to TimeSpan for comparison
-            TimeSpan start = TimeSpan.Parse(startTime);
-            TimeSpan end = TimeSpan.Parse(endTime);
-
-            // Check if start time is less than end time
-            return start < end;
-        }
-
-
         private void LoadDepartmentDetails()
         {
             try
@@ -86,26 +75,42 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
-        private void LoadInstructors()
+        private void LoadInstructors(string statusFilter = "Active")
         {
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
+                    // Base query
                     string query = @"
-                       SELECT i.Internal_Employee_Id, 
-                              d.Dept_code AS Department,
-                              i.Employee_Id,
-                              i.Lname AS LastName, 
-                              i.Mname AS MiddleName, 
-                              i.Fname AS FirstName, 
-                              i.Employment_Type AS Employment, 
-                              i.Employee_Sex AS Sex, 
-                              i.Email
-                       FROM instructor i
-                       JOIN departments d ON i.Dept_Id = d.Dept_Id
-                       WHERE i.Dept_Id = @deptId and i.Status = 1;";
+                SELECT i.Internal_Employee_Id, 
+                       d.Dept_code AS Department,
+                       i.Employee_Id,
+                       i.Lname AS LastName, 
+                       i.Mname AS MiddleName, 
+                       i.Fname AS FirstName, 
+                       i.Employment_Type AS Employment, 
+                       i.Employee_Sex AS Sex, 
+                       i.Email,
+                       i.Disability,
+                       CASE 
+                           WHEN i.Status = 1 THEN 'Active'
+                           ELSE 'Inactive'
+                       END AS Status
+                FROM instructor i
+                JOIN departments d ON i.Dept_Id = d.Dept_Id
+                WHERE i.Dept_Id = @deptId";
+
+                    // Add a condition for filtering by status
+                    if (statusFilter == "Active")
+                    {
+                        query += " AND i.Status = 1";
+                    }
+                    else if (statusFilter == "Inactive")
+                    {
+                        query += " AND i.Status = 0";
+                    }
 
                     MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@deptId", DepartmentId);
@@ -121,6 +126,36 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Error loading instructor details: " + ex.Message);
             }
         }
+
+        private void Status_cmb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Status_cmb.SelectedItem != null)
+            {
+                ComboBoxItem selectedItem = (ComboBoxItem)Status_cmb.SelectedItem;
+                string selectedStatus = selectedItem.Content.ToString();
+
+                // Pass the selected status to filter the data
+                LoadInstructors(selectedStatus);
+
+                // Change button content based on the selected status
+                if (selectedStatus == "Active")
+                {
+                    instructorStatus_btn.Content = "Deactivate"; // For active departments
+                    instructorStatus_btn.FontSize = 12;
+                }
+                else if (selectedStatus == "Inactive")
+                {
+                    instructorStatus_btn.Content = "Activate"; // For inactive departments
+                    instructorStatus_btn.FontSize = 12;
+                }
+                else
+                {
+                    instructorStatus_btn.Content = "Switch Status"; // Default text for "All"
+                    instructorStatus_btn.FontSize = 10;
+                }
+            }
+        }
+
 
 
         private void NavigateBack(string sourceButton)
@@ -151,6 +186,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             string employmentType = employment_txt.Text;
             string email = email_txt.Text;
             string sex = male_rbtn.IsChecked == true ? "M" : female_rbtn.IsChecked == true ? "F" : "";
+            int disability = disability_ckbox.IsChecked == true ? 1 : 0;
 
             // Validate inputs
             if (string.IsNullOrWhiteSpace(employeeId) ||
@@ -171,10 +207,10 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     connection.Open();
 
-                    // Generate a new Employee_Id (assuming it's an auto-increment field)
+                    // Insert into instructor table, including disability
                     string query = @"
-                        INSERT INTO instructor (Dept_Id, Employee_Id, Fname, Mname, Lname, Employment_Type, Employee_Sex, Email) 
-                        VALUES (@Dept_Id, @Employee_Id, @Fname, @Mname, @Lname, @Employment_Type, @Employee_Sex, @Email)";
+                INSERT INTO instructor (Dept_Id, Employee_Id, Fname, Mname, Lname, Employment_Type, Employee_Sex, Email, Disability) 
+                VALUES (@Dept_Id, @Employee_Id, @Fname, @Mname, @Lname, @Employment_Type, @Employee_Sex, @Email, @Disability)";
 
                     MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Dept_Id", DepartmentId);
@@ -185,6 +221,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     command.Parameters.AddWithValue("@Employment_Type", employmentType);
                     command.Parameters.AddWithValue("@Employee_Sex", sex);
                     command.Parameters.AddWithValue("@Email", email);
+                    command.Parameters.AddWithValue("@Disability", disability); // Handle disability
 
                     command.ExecuteNonQuery();
                     MessageBox.Show("Instructor added successfully!");
@@ -197,6 +234,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     lastName_txt.Clear();
                     employment_txt.Clear();
                     email_txt.Clear();
+                    disability_ckbox.IsChecked = false;
                     male_rbtn.IsChecked = false;
                     female_rbtn.IsChecked = false;
                 }
@@ -207,10 +245,12 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
+
         private void instructor_data_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (instructor_data.SelectedItem is DataRowView selectedRow)
             {
+                // Set other fields
                 InternalEmployeeId = (int)selectedRow["Internal_Employee_Id"];
                 employeeId_txt.Text = selectedRow["Employee_Id"].ToString();
                 firstName_txt.Text = selectedRow["FirstName"].ToString();
@@ -219,6 +259,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 employment_txt.Text = selectedRow["Employment"].ToString();
                 email_txt.Text = selectedRow["Email"].ToString();
 
+                // Handle sex selection
                 string sex = selectedRow["Sex"].ToString();
                 if (sex == "M")
                 {
@@ -227,12 +268,39 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 else if (sex == "F")
                 {
                     female_rbtn.IsChecked = true;
-
                 }
+
+                // Handle disability checkbox (assuming Disability can be "1" or "0", or possibly true/false)
+                object disabilityValue = selectedRow["Disability"];
+                if (disabilityValue != DBNull.Value)
+                {
+                    // Check if it's a boolean or an integer ("1" or "0")
+                    if (disabilityValue is bool)
+                    {
+                        disability_ckbox.IsChecked = (bool)disabilityValue;
+                    }
+                    else if (disabilityValue is int)
+                    {
+                        disability_ckbox.IsChecked = ((int)disabilityValue == 1);
+                    }
+                    else
+                    {
+                        // Handle string or other types, just in case
+                        disability_ckbox.IsChecked = disabilityValue.ToString() == "1";
+                    }
+                }
+                else
+                {
+                    disability_ckbox.IsChecked = false; // Default to unchecked if no value
+                }
+
+                // Load related data
                 LoadInstructorSubjects(InternalEmployeeId);
                 LoadAvailability(InternalEmployeeId);
             }
         }
+
+
 
         private void instructorStatus_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -244,34 +312,44 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     {
                         connection.Open();
 
-                        string query = "UPDATE instructor SET status = 0 WHERE Instructor_Employee_Id = @InstructorEmployeeId";
+                        // Get the current status from the selected row
+                        bool isActive = selectedRow["Status"].ToString() == "Active";
+
+                        // If the instructor is active, set status to 0 (deactivate); if inactive, set to 1 (activate)
+                        string query = isActive
+                            ? "UPDATE instructor SET Status = 0 WHERE Internal_Employee_Id = @InternalEmployeeId"
+                            : "UPDATE instructor SET Status = 1 WHERE Internal_Employee_Id = @InternalEmployeeId";
 
                         MySqlCommand command = new MySqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@EmployeeId", InternalEmployeeId);
+                        command.Parameters.AddWithValue("@InternalEmployeeId", (int)selectedRow["Internal_Employee_Id"]);
 
                         int rowsAffected = command.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            MessageBox.Show("Instructor removed successfully.");
-                            LoadInstructors(); // Refresh the DataGrid
+                            // Provide appropriate feedback based on the action performed
+                            string message = isActive ? "Instructor deactivated successfully." : "Instructor activated successfully.";
+                            MessageBox.Show(message);
+
+                            // Refresh the DataGrid to reflect the updated status
+                            LoadInstructors();
                         }
                         else
                         {
-                            MessageBox.Show("Error removing instructor.");
+                            MessageBox.Show("Error updating instructor status.");
                         }
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    MessageBox.Show("Error removing instructor: " + ex.Message);
+                    MessageBox.Show("Error updating instructor status: " + ex.Message);
                 }
             }
             else
             {
-                MessageBox.Show("Please select an instructor to remove.");
+                MessageBox.Show("Please select an instructor to change their status.");
             }
-
         }
+
 
         private void instructorSave_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -283,12 +361,12 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
                     string query = @"
                 UPDATE instructor 
-                SET Employee_Id =  @Employee_Id, Lname = @LastName, Mname = @MiddleName, Fname = @FirstName, 
-                    Employment_Type = @Employment, Employee_Sex = @Sex, Email = @Email
+                SET Employee_Id = @Employee_Id, Lname = @LastName, Mname = @MiddleName, Fname = @FirstName, 
+                    Employment_Type = @Employment, Employee_Sex = @Sex, Email = @Email, Disability = @Disability
                 WHERE Internal_Employee_Id = @Internal_Employee_Id";
 
                     MySqlCommand command = new MySqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Interal_Employee_Id", InternalEmployeeId);
+                    command.Parameters.AddWithValue("@Internal_Employee_Id", InternalEmployeeId);
                     command.Parameters.AddWithValue("@Employee_Id", employeeId_txt.Text);
                     command.Parameters.AddWithValue("@LastName", lastName_txt.Text);
                     command.Parameters.AddWithValue("@MiddleName", middleName_txt.Text);
@@ -296,7 +374,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     command.Parameters.AddWithValue("@Employment", employment_txt.Text);
                     command.Parameters.AddWithValue("@Sex", male_rbtn.IsChecked == true ? "M" : "F");
                     command.Parameters.AddWithValue("@Email", email_txt.Text);
-                    command.Parameters.AddWithValue("@EmployeeId", employeeId_txt.Text);
+                    command.Parameters.AddWithValue("@Disability", disability_ckbox.IsChecked == true ? 1 : 0); // Handle disability
 
                     int rowsAffected = command.ExecuteNonQuery();
                     if (rowsAffected > 0)
@@ -315,6 +393,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Error updating instructor details: " + ex.Message);
             }
         }
+
 
         //   Subejcts   //////////////////////////////////////////
         private void LoadSubjects()
@@ -761,8 +840,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Please select an availability record to delete.");
             }
         }
-
-
 
     }
 

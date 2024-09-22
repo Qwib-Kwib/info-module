@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Info_module.Pages.TableMenus.After_College_Selection.CSVMenu;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,26 +16,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MySql.Data.MySqlClient;
-using Microsoft.Win32;
-using System.Data;
-using CsvHelper;
-using System.Globalization;
-using static Info_module.Pages.TableMenus.After_College_Selection.CurriculumMenu;
-using Info_module.Pages.TableMenus.After_College_Selection.CSVMenu;
 
 namespace Info_module.Pages.TableMenus.After_College_Selection
 {
     /// <summary>
-    /// Interaction logic for CurriculumMenu.xaml
+    /// Interaction logic for CurriculumPage.xaml
     /// </summary>
-    public partial class CurriculumMenu : Page
+    public partial class CurriculumPage : Page
     {
         public int DepartmentId { get; set; }
 
         private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
 
-        public CurriculumMenu(int departmentId)
+        public CurriculumPage(int departmentId)
         {
             InitializeComponent();
             LoadCurriculum();
@@ -45,7 +40,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
             DepartmentId = departmentId;
             LoadDepartmentDetails();
-            
+
         }
 
         private void TopBar_BackButtonClicked(object sender, EventArgs e)
@@ -158,22 +153,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 // Pass the selected status to filter the data
                 LoadCurriculum(selectedStatus);
 
-                // Change button content based on the selected status
-                if (selectedStatus == "Active")
-                {
-                    status_btn.Content = "Deactivate"; // For active departments
-                    status_btn.FontSize = 12;
-                }
-                else if (selectedStatus == "Inactive")
-                {
-                    status_btn.Content = "Activate"; // For inactive departments
-                    status_btn.FontSize = 12;
-                }
-                else
-                {
-                    status_btn.Content = "Switch Status"; // Default text for "All"
-                    status_btn.FontSize = 6;
-                }
             }
         }
 
@@ -389,7 +368,5 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             int.TryParse(curriculumId_txt.Text, out int curriculumId);
             NavigationService.Navigate(new CurriculumCSV(DepartmentId, curriculumId));
         }
-
-
     }
 }
