@@ -84,7 +84,7 @@
                             <TextBox x:Name="yearEffectiveOut_txt" TextWrapping="Wrap" Height="20" Grid.Column="2"/>
                             <Rectangle Grid.Column="1" Stroke="Black" Margin="15,9,15,9" Fill="Black"/>
                         </Grid>
-                        <Button x:Name="status_btn" Content="Switch Status" Margin="181,168,14,0" VerticalAlignment="Top" Click="Status_btn_Click" Height="20" Width="60" Grid.Row="1"/>
+                        <Button x:Name="status_btn" Content="Switch Status" Margin="178,168,17,0" VerticalAlignment="Top" Click="Status_btn_Click" Height="20" Width="60" Grid.Row="1" FontSize="9"/>
                     </Grid>
                 </Viewbox>
             </Viewbox>

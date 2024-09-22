@@ -17,7 +17,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static Info_module.Pages.TableMenus.After_College_Selection.CurriculumMenu;
 using System.Globalization;
 
 namespace Info_module.Pages.TableMenus.After_College_Selection

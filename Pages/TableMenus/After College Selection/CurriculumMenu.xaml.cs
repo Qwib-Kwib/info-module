@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Info_module.Pages.TableMenus.After_College_Selection.CSVMenu;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,13 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MySql.Data.MySqlClient;
-using Microsoft.Win32;
-using System.Data;
-using CsvHelper;
-using System.Globalization;
-using static Info_module.Pages.TableMenus.After_College_Selection.CurriculumMenu;
-using Info_module.Pages.TableMenus.After_College_Selection.CSVMenu;
 
 namespace Info_module.Pages.TableMenus.After_College_Selection
 {
@@ -33,26 +28,37 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
 
+
         public CurriculumMenu(int departmentId)
         {
             InitializeComponent();
-            LoadCurriculum();
+            DepartmentId = departmentId;
+            LoadUI();
+        }
+
+        #region UI
+
+        // Method to set up the TopBar
+        private void LoadUI()
+        {
             TopBar topBar = new TopBar();
             topBar.txtPageTitle.Text = "Curriculum Menu";
             topBar.Visibility = Visibility.Visible;
             topBar.BackButtonClicked += TopBar_BackButtonClicked;
             TopBarFrame.Navigate(topBar);
-
-            DepartmentId = departmentId;
+            // Navigate the frame to TopBar
+            Status_cmb.SelectionChanged += Status_cmb_SelectionChanged;
             LoadDepartmentDetails();
-            
+            LoadCurriculum();
         }
 
+        // Event handler for the TopBar back button
         private void TopBar_BackButtonClicked(object sender, EventArgs e)
         {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
             NavigateBack("Curriculum");
         }
+
+        // Method to navigate back to the previous page
         private void NavigateBack(string sourceButton)
         {
             CollegeSelection collegeSelection = new CollegeSelection(sourceButton);
@@ -102,6 +108,10 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
+        #endregion
+
+
+        #region Datagrid
         private void LoadCurriculum(string selectedStatus = "Active")
         {
             try
@@ -110,26 +120,32 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     connection.Open();
 
-                    // Determine the status filter (1 for Active, 0 for Inactive)
-                    int statusFilter = selectedStatus == "Active" ? 1 : 0;
-
                     string query = @"
-                SELECT 
-                    Curriculum_Id, 
-                    Curriculum_Revision, 
-                    Curriculum_Description, 
-                    CONCAT(Year_Effective_In, '-', Year_Effective_Out) AS Year_Effective,
-                    CASE 
-                        WHEN Status = 1 THEN 'Active' 
-                        ELSE 'Inactive' 
-                    END AS Status
-                FROM curriculum
-                WHERE Status = @statusFilter"; // Filter by the provided status
+            SELECT 
+                Curriculum_Id, 
+                Curriculum_Revision, 
+                Curriculum_Description, 
+                CONCAT(Year_Effective_In, '-', Year_Effective_Out) AS Year_Effective,
+                CASE 
+                    WHEN Status = 1 THEN 'Active' 
+                    ELSE 'Inactive' 
+                END AS Status
+            FROM curriculum";
+
+                    if (selectedStatus != "All")
+                    {
+                        // Add a status filter to the query
+                        query += " WHERE Status = @statusFilter";
+                    }
 
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        // Pass the status filter as a parameter
-                        command.Parameters.AddWithValue("@statusFilter", statusFilter);
+                        if (selectedStatus != "All")
+                        {
+                            // Set status filter: 1 for Active, 0 for Inactive
+                            int statusFilter = selectedStatus == "Active" ? 1 : 0;
+                            command.Parameters.AddWithValue("@statusFilter", statusFilter);
+                        }
 
                         DataTable dataTable = new DataTable();
                         using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
@@ -139,7 +155,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
                         curriculumDataGrid.ItemsSource = dataTable.DefaultView;
                     }
-
                 }
             }
             catch (MySqlException ex)
@@ -150,33 +165,68 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         private void Status_cmb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            string selectedStatus = "Active";
+            if (curriculumStatus_btn == null)
+            {
+                return;
+            }
+
             if (Status_cmb.SelectedItem != null)
             {
                 ComboBoxItem selectedItem = (ComboBoxItem)Status_cmb.SelectedItem;
-                string selectedStatus = selectedItem.Content.ToString();
+                selectedStatus = selectedItem.Content.ToString();
 
-                // Pass the selected status to filter the data
+                // Load the curriculum data filtered by the selected status
                 LoadCurriculum(selectedStatus);
 
-                // Change button content based on the selected status
+                // Dynamically change the button content based on the selected status
                 if (selectedStatus == "Active")
                 {
-                    status_btn.Content = "Deactivate"; // For active departments
-                    status_btn.FontSize = 12;
+                    curriculumStatus_btn.Content = "Deactivate";
+                    curriculumStatus_btn.FontSize = 12;
                 }
                 else if (selectedStatus == "Inactive")
                 {
-                    status_btn.Content = "Activate"; // For inactive departments
-                    status_btn.FontSize = 12;
+                    curriculumStatus_btn.Content = "Activate";
+                    curriculumStatus_btn.FontSize = 12;
                 }
                 else
                 {
-                    status_btn.Content = "Switch Status"; // Default text for "All"
-                    status_btn.FontSize = 6;
+                    curriculumStatus_btn.Content = "Switch Status";
+                    curriculumStatus_btn.FontSize = 10;
                 }
             }
         }
 
+
+
+
+        #endregion
+
+        #region Forms
+        private void curriculumDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (curriculumDataGrid.SelectedItem is DataRowView selectedRow)
+            {
+                curriculumId_txt.Text = selectedRow["Curriculum_Id"].ToString();
+                curriculumRevision_txt.Text = selectedRow["Curriculum_Revision"].ToString();
+                curriculumDescription_txt.Text = selectedRow["Curriculum_Description"].ToString();
+
+                // Split the "Year_Effective" column if it contains the combined year range
+                string yearEffective = selectedRow["Year_Effective"].ToString();
+                if (yearEffective.Contains('-'))
+                {
+                    var years = yearEffective.Split('-');
+                    yearEffectiveIn_txt.Text = years[0];
+                    yearEffectiveOut_txt.Text = years[1];
+                }
+                else
+                {
+                    yearEffectiveIn_txt.Text = yearEffective;
+                    yearEffectiveOut_txt.Text = string.Empty;
+                }
+            }
+        }
 
         private void ClearTextboxes()
         {
@@ -186,6 +236,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             yearEffectiveIn_txt.Clear();
             yearEffectiveOut_txt.Clear();
         }
+
 
         private void Add_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -216,7 +267,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Error adding curriculum: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
 
         private void Edit_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -281,8 +331,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
-
-        private void Status_btn_Click(object sender, RoutedEventArgs e)
+        private void CurriculumStatus_btn_Click(object sender, RoutedEventArgs e)
         {
             // Check if the Curriculum_Id textbox is empty
             if (string.IsNullOrWhiteSpace(curriculumId_txt.Text))
@@ -354,30 +403,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
-        private void curriculumDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (curriculumDataGrid.SelectedItem is DataRowView selectedRow)
-            {
-                curriculumId_txt.Text = selectedRow["Curriculum_Id"].ToString();
-                curriculumRevision_txt.Text = selectedRow["Curriculum_Revision"].ToString();
-                curriculumDescription_txt.Text = selectedRow["Curriculum_Description"].ToString();
-
-                // Split the "Year_Effective" column if it contains the combined year range
-                string yearEffective = selectedRow["Year_Effective"].ToString();
-                if (yearEffective.Contains('-'))
-                {
-                    var years = yearEffective.Split('-');
-                    yearEffectiveIn_txt.Text = years[0];
-                    yearEffectiveOut_txt.Text = years[1];
-                }
-                else
-                {
-                    yearEffectiveIn_txt.Text = yearEffective;
-                    yearEffectiveOut_txt.Text = string.Empty;
-                }
-            }
-        }
-
         private void subject_btn_Click(object sender, RoutedEventArgs e)
         {
             // Check if the Curriculum_Id textbox is empty
@@ -391,5 +416,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
         }
 
 
+
+
+        #endregion
     }
 }

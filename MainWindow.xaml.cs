@@ -31,6 +31,7 @@ namespace Info_module
         {
             InitializeComponent();
             Login login = new Login();
+            
 
 
             MainFrame.Navigate(login);

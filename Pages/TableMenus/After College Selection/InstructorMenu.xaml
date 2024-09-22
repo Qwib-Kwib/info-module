@@ -45,7 +45,7 @@
                                 <TextBlock HorizontalAlignment="Left" Margin="139,91,0,0" TextWrapping="Wrap" Text="Sex:" VerticalAlignment="Top" Width="30"/>
                                 <Button x:Name="instructorAdd_btn" Content="Add" Margin="19,201,167,88" Width="65" Height="20" Click="instructorAdd_btn_Click"/>
                                 <Button x:Name="instructorEdit_btn" Content="Save" Margin="95,201,95,88" Width="65" Height="20" Click="instructorSave_btn_Click"/>
-                                <Button x:Name="instructorStatus_btn" Content="Deactivate" Margin="171,201,19,88" Width="65" Height="20" Click="instructorStatus_btn_Click"/>
+                                <Button x:Name="instructorStatus_btn" Content="Deactivate" Margin="171,201,19,88" Width="65" Height="20" Click="instructorStatus_btn_Click" FontSize="12"/>
                                 <Button x:Name="btnInstrutorCSV" Content="Upload CSV" Margin="80,235,80,54" Click="btnInstrutorCSV_Click" Height="20" Width="95"/>
                                 <CheckBox x:Name="disability_ckbox" Content="Disability" HorizontalAlignment="Left" Margin="139,132,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.479,0.734"/>
                             </Grid>

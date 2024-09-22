@@ -3,9 +3,10 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Info_module.Pages.TableMenus.After_College_Selection"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="CurriculumMenu" Background="Black">
+      Title="CurriculumMenu">
 
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -65,7 +66,7 @@
                         <TextBox x:Name="curriculumId_txt" HorizontalAlignment="Left" Margin="9,16,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110" Height="20" Grid.Row="1" IsEnabled="False"/>
                         <TextBlock x:Name="test_txt" HorizontalAlignment="Left" Margin="10,95,0,0" TextWrapping="Wrap" Text="Curriculum ID" VerticalAlignment="Top" Grid.RowSpan="2"/>
                         <Button x:Name="Add_btn" Content="Add" Margin="10,168,175,35" Width="70" Height="20" Click="Add_btn_Click" Grid.Row="1"/>
-                        <Button x:Name="Edit_btn" Content="Edit" Margin="92,168,93,35" Width="70" Height="20" Click="Edit_btn_Click" Grid.Row="1"/>
+                        <Button x:Name="Edit_btn" Content="Update" Margin="92,168,93,35" Width="70" Height="20" Click="Edit_btn_Click" Grid.Row="1"/>
                         <Button x:Name="subject_btn" Content="Configure Subject" Margin="75,193,75,10" Grid.Row="1" Click="subject_btn_Click"/>
                         <TextBox x:Name="curriculumRevision_txt" Margin="9,52,33,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Grid.Row="1"/>
                         <TextBlock HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="Curriculum Revision" VerticalAlignment="Top" Grid.Row="1"/>
@@ -83,7 +84,7 @@
                             <TextBox x:Name="yearEffectiveOut_txt" TextWrapping="Wrap" Height="20" Grid.Column="2"/>
                             <Rectangle Grid.Column="1" Stroke="Black" Margin="15,9,15,9" Fill="Black"/>
                         </Grid>
-                        <Button x:Name="status_btn" Content="Activate" Margin="181,168,14,0" VerticalAlignment="Top" Click="Status_btn_Click" Height="20" Width="60" Grid.Row="1"/>
+                        <Button x:Name="curriculumStatus_btn" Content="Deactivate" Margin="174,168,17,0" VerticalAlignment="Top" Click="CurriculumStatus_btn_Click" Height="20" Grid.Row="1"/>
                     </Grid>
                 </Viewbox>
             </Viewbox>

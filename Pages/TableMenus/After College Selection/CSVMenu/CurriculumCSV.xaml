@@ -28,7 +28,7 @@
                         <RowDefinition Height="8.5*"/>
                     </Grid.RowDefinitions>
                     <Viewbox Margin="10,10,10,10" Grid.Row="1" Stretch="Fill">
-                        <DataGrid x:Name="subject_data" IsReadOnly="True" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" Height="283" Width="755" AllowDrop="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <DataGrid x:Name="subject_data" IsReadOnly="True" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" Height="439" Width="914" AllowDrop="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Subject_Id}" Header="Subject Id" CanUserResize="False" CanUserReorder="False" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding Serving_Department}" Header="Serving Department" CanUserResize="False" CanUserReorder="False" IsReadOnly="True"/>
