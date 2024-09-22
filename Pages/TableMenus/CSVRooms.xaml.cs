@@ -53,7 +53,7 @@ namespace Info_module.Pages.TableMenus
 
         }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+		private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
 
         private void LoadBuildingDetails() //change text block
         {
@@ -96,12 +96,9 @@ namespace Info_module.Pages.TableMenus
                                 @BuildingCode AS Building_Code, 
                                 Room_Code, 
                                 Room_Floor AS Floor_Level, 
-                                Room_Type, 
+                                Room_Type,  
                                 Max_Seat, 
-                                CASE
-                                            When Status = 1 then 'Active'
-                                            Else 'Inactive'
-                                        End as 'Status' 
+                                status AS Availability 
                              FROM rooms 
                              WHERE Building_Id = @BuildingId";
                     MySqlCommand command = new MySqlCommand(query, connection);
@@ -140,7 +137,6 @@ namespace Info_module.Pages.TableMenus
                     if (dataTable != null)
                     {
                         room_data.ItemsSource = dataTable.DefaultView;
-                        Cancel_btn.Visibility = Visibility.Visible;
                     }
                 }
                 catch (Exception ex)
@@ -217,7 +213,7 @@ namespace Info_module.Pages.TableMenus
         private void TopBar_BackButtonClicked(object sender, EventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new BuildingMenu());
+            mainWindow.MainFrame.Navigate(new BuildingMap());
         }
 
         private void back_btn_Click(object sender, RoutedEventArgs e)
@@ -325,10 +321,9 @@ namespace Info_module.Pages.TableMenus
             }
         }
 
-        private void Cancel_btn_Click(object sender, RoutedEventArgs e)
+        private void ViewData_btn_Click(object sender, RoutedEventArgs e)
         {
             LoadBuilding();
-            Cancel_btn.Visibility = Visibility.Hidden;
 
         }
 
@@ -361,7 +356,7 @@ namespace Info_module.Pages.TableMenus
                         }
                     }
                     MessageBox.Show("Status updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    Cancel_btn_Click(sender, e); // Refresh data after updating status
+                    ViewData_btn_Click(sender, e); // Refresh data after updating status
                 }
                 catch (MySqlException ex)
                 {
@@ -385,10 +380,9 @@ namespace Info_module.Pages.TableMenus
                 selectedFloorLevel = Convert.ToInt32(selectedRow["Floor_Level"]);
                 selectedRoomType = selectedRow["Room_Type"].ToString();
                 selectedMaxSeat = Convert.ToInt32(selectedRow["Max_Seat"]);
-                string statusString = selectedRow["Status"].ToString();
-                selectedAvailability = statusString == "Active" ? 1 : 0;
+                selectedAvailability = Convert.ToInt32(selectedRow["Availability"]);
 
-
+                
                 // roomCodeTextBox.Text = selectedRoomCode;
                 // floorLevelTextBox.Text = selectedFloorLevel.ToString();
                 // roomTypeTextBox.Text = selectedRoomType;
