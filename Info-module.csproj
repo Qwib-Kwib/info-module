@@ -169,6 +169,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\TableMenus\After College Selection\Assignment.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\TableMenus\BuildingMap.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Pages\TableMenus\BuildingMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -223,6 +231,12 @@
     </Compile>
     <Compile Include="Pages\TableMenus\After College Selection\InstructorMenu.xaml.cs">
       <DependentUpon>InstructorMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TableMenus\After College Selection\Assignment.xaml.cs">
+      <DependentUpon>Assignment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TableMenus\BuildingMap.xaml.cs">
+      <DependentUpon>BuildingMap.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\TableMenus\BuildingMenu.xaml.cs">
       <DependentUpon>BuildingMenu.xaml</DependentUpon>
@@ -306,6 +320,9 @@
     <Resource Include="Images\Nursing.jpeg" />
     <Resource Include="Images\Pharma.jpeg" />
     <Resource Include="Images\Theology.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Campus-Map.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

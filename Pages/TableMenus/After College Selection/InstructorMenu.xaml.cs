@@ -47,6 +47,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             LoadSubjects();
         }
 
+        #region Instructor
+
         private void LoadDepartmentDetails()
         {
             try
@@ -392,9 +394,17 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Error updating instructor details: " + ex.Message);
             }
         }
-
+        #endregion
 
         //   Subejcts   //////////////////////////////////////////
+
+        #region Subjects
+        public class Subject
+        {
+            public int SubjectId { get; set; }
+            public string SubjectCode { get; set; }
+        }
+
         private void LoadSubjects()
         {
             try
@@ -406,9 +416,9 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Dept_Id", DepartmentId);
 
+                    List<Subject> subjects = new List<Subject>();
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        List<Subject> subjects = new List<Subject>();
                         while (reader.Read())
                         {
                             subjects.Add(new Subject
@@ -417,10 +427,11 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                                 SubjectCode = reader.GetString("Subject_Code")
                             });
                         }
-                        subjectCode_cmbx.ItemsSource = subjects;
-                        subjectCode_cmbx.DisplayMemberPath = "SubjectCode";
-                        subjectCode_cmbx.SelectedValuePath = "SubjectId";
                     }
+
+                    subjectCode_cmbx.ItemsSource = subjects;
+                    subjectCode_cmbx.DisplayMemberPath = "SubjectCode";
+                    subjectCode_cmbx.SelectedValuePath = "SubjectId";
                 }
             }
             catch (MySqlException ex)
@@ -429,76 +440,68 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
-
-        public class Subject
-        {
-            public int SubjectId { get; set; }
-            public string SubjectCode { get; set; }
-        }
-
         private void subjectCode_cmbx_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (subjectCode_cmbx.SelectedItem != null)
+            if (subjectCode_cmbx.SelectedItem is Subject selectedSubject)
             {
-                Subject selectedSubject = (Subject)subjectCode_cmbx.SelectedItem;
-                int subjectId = selectedSubject.SubjectId;
-
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        connection.Open();
-                        string query = "SELECT Subject_Title FROM subjects WHERE Subject_Id = @subjectId";
-                        MySqlCommand command = new MySqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@subjectId", subjectId);
-
-                        using (MySqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                string subjectName = reader["Subject_Title"].ToString();
-                                subject_txt.Text = subjectName;
-                            }
-                        }
-                    }
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("Error loading subject details: " + ex.Message);
-                }
+                LoadSubjectDetails(selectedSubject.SubjectId);
             }
         }
 
+        private void LoadSubjectDetails(int subjectId)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT Subject_Title FROM subjects WHERE Subject_Id = @subjectId";
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@subjectId", subjectId);
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            subject_txt.Text = reader["Subject_Title"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Error loading subject details: " + ex.Message);
+            }
+        }
 
         private void subjectAdd_btn_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(employeeId_txt.Text))
             {
                 MessageBox.Show("Please select a valid instructor first.");
-                return; // Exit the method if no instructor is selected
+                return;
             }
 
             try
             {
-                // Get selected values
                 int internalEmployeeId = InternalEmployeeId;
                 int subjectId = Convert.ToInt32(subjectCode_cmbx.SelectedValue);
+                int quantity = Convert.ToInt32(quantity_txtbx.Text);
 
-                // Check if the subject is already assigned to the instructor
                 if (IsSubjectAlreadyAssigned(internalEmployeeId, subjectId))
                 {
                     MessageBox.Show("This subject is already assigned to the selected instructor.");
                     return;
                 }
 
-                // Insert into database
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = "INSERT INTO instructor_subject (Internal_Employee_Id, Subject_Id) VALUES (@InternalEmployeeId, @subjectId)";
+                    string query = "INSERT INTO instructor_subject (Internal_Employee_Id, Subject_Id, Quantity) VALUES (@InternalEmployeeId, @subjectId, @quantity)";
                     MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@InternalEmployeeId", internalEmployeeId);
                     command.Parameters.AddWithValue("@subjectId", subjectId);
+                    command.Parameters.AddWithValue("@quantity", quantity);
                     command.ExecuteNonQuery();
                 }
 
@@ -510,34 +513,28 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
-        private bool IsSubjectAlreadyAssigned(int employeeId, int subjectId)
+        private bool IsSubjectAlreadyAssigned(int internalEmployeeId, int subjectId)
         {
-            bool isAssigned = false;
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = "SELECT COUNT(*) FROM instructor_subject WHERE Internal_Employee_Id = @employeeId AND Subject_Id = @subjectId";
+                    string query = "SELECT COUNT(*) FROM instructor_subject WHERE Internal_Employee_Id = @internalEmployeeId AND Subject_Id = @subjectId";
                     MySqlCommand command = new MySqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@employeeId", employeeId);
+                    command.Parameters.AddWithValue("@internalEmployeeId", internalEmployeeId);
                     command.Parameters.AddWithValue("@subjectId", subjectId);
 
                     int count = Convert.ToInt32(command.ExecuteScalar());
-                    if (count > 0)
-                    {
-                        isAssigned = true;
-                    }
+                    return count > 0;
                 }
             }
             catch (MySqlException ex)
             {
                 MessageBox.Show("Error checking subject assignment: " + ex.Message);
+                return false;
             }
-
-            return isAssigned;
         }
-
 
         private void subjectDelete_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -545,10 +542,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             {
                 try
                 {
-                    // Get Instructor_Subject_Id from the selected DataRowView
                     int instructorSubjectId = Convert.ToInt32(selectedRow["Instructor_Subject_Id"]);
 
-                    // Delete from database
                     using (MySqlConnection connection = new MySqlConnection(connectionString))
                     {
                         connection.Open();
@@ -560,8 +555,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Subject deleted from instructor successfully.");
-                            // Refresh the DataGrid
-                            LoadInstructorSubjects(instructorSubjectId); // Call a method to reload data in the DataGrid
+                            LoadInstructorSubjects(InternalEmployeeId);
                         }
                         else
                         {
@@ -588,7 +582,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     connection.Open();
                     string query = @"
-                SELECT isub.Instructor_Subject_Id, s.Subject_Code, s.Subject_Title
+                SELECT isub.Instructor_Subject_Id, s.Subject_Code, s.Subject_Title, isub.Quantity
                 FROM instructor_subject isub
                 JOIN subjects s ON isub.Subject_Id = s.Subject_Id
                 WHERE isub.Internal_Employee_Id = @internalEmployeeId";
@@ -600,11 +594,6 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     DataTable dataTable = new DataTable();
                     dataAdapter.Fill(dataTable);
 
-                    // Ensure columns are in the correct order
-                    dataTable.Columns["Instructor_Subject_Id"].SetOrdinal(0);
-                    dataTable.Columns["Subject_Code"].SetOrdinal(1);
-                    dataTable.Columns["Subject_Title"].SetOrdinal(2);
-
                     instrutorSubject_data.ItemsSource = dataTable.DefaultView;
                 }
             }
@@ -614,10 +603,86 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
+        private void Quantity_txtbx_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = IsTextNumeric(e.Text);
+        }
+
+        private static bool IsTextNumeric(string str)
+        {
+            return System.Text.RegularExpressions.Regex.IsMatch(str, "[^0-9]");
+        }
+
+        private void instrutorSubject_data_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Handle selection changes in the DataGrid
+            if (instrutorSubject_data.SelectedItem is DataRowView selectedRow)
+            {
+                // Find the Subject_Id based on the selected Subject_Code from the DataGrid
+                string selectedSubjectCode = selectedRow["Subject_Code"].ToString();
+                quantity_txtbx.Text = selectedRow["Quantity"].ToString();
+
+                // Loop through ComboBox items to find the matching Subject_Id
+                foreach (Subject subject in subjectCode_cmbx.Items)
+                {
+                    if (subject.SubjectCode == selectedSubjectCode)
+                    {
+                        subjectCode_cmbx.SelectedValue = subject.SubjectId; // Set the ComboBox SelectedValue to Subject_Id
+                        subject_txt.Text = selectedRow["Subject_Title"].ToString(); // Set the subject_txt to display the Subject Title
+                        break;
+                    }
+                }
+            }
+        }
 
 
+        private void update_btn_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            // Check if a subject is selected in the DataGrid
+            if (instrutorSubject_data.SelectedItem is DataRowView selectedRow)
+            {
+                // Get the Instructor_Subject_Id and the new quantity value
+                int instructorSubjectId = Convert.ToInt32(selectedRow["Instructor_Subject_Id"]);
+
+                // Validate that a numeric value is entered for the quantity
+                if (int.TryParse(quantity_txtbx.Text, out int newQuantity) && newQuantity > 0)
+                {
+                    // Update the quantity in the database
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        string query = "UPDATE instructor_subject SET Quantity = @quantity WHERE Instructor_Subject_Id = @instructorSubjectId";
+                        MySqlCommand command = new MySqlCommand(query, connection);
+                        command.Parameters.AddWithValue("@quantity", newQuantity);
+                        command.Parameters.AddWithValue("@instructorSubjectId", instructorSubjectId);
+
+                        // Execute the query
+                        int rowsAffected = command.ExecuteNonQuery();
+                        MessageBox.Show("Update Succesfully");
+
+                        // Refresh the DataGrid to show updated values if rows were affected
+                        if (rowsAffected > 0)
+                        {
+                            int internalEmployeeId = InternalEmployeeId; // Assuming you have this variable
+                            LoadInstructorSubjects(internalEmployeeId);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a subject to update.");
+            }
+        }
+
+
+
+
+
+        #endregion
 
         //   Availability   /////////////////////////
+        #region Availability
         private void LoadAvailability(int entityId)
         {
             try
@@ -840,6 +905,9 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
         }
 
+        #endregion
+
+        
     }
 
 }

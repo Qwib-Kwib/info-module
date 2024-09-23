@@ -62,10 +62,9 @@ namespace Info_module.Pages
 
         }
 
-        private void btnMenuStudents_Click(object sender, RoutedEventArgs e)
+        private void Assignment_btn_Click(object sender, RoutedEventArgs e)
         {
-            NavigatefromMainMenu("Student");
-
+            NavigationService.Navigate(new Assignment()) ;
         }
     }
 }

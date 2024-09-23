@@ -165,7 +165,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection.CSVMenu
 
         private void NavigateBack(string sourceButton)
         {
-            NavigationService.Navigate(new CurriculumPage(DepartmentId));
+            NavigationService.Navigate(new CurriculumMenu(DepartmentId));
         }
 
         private void TopBar_BackButtonClicked(object sender, EventArgs e)
@@ -271,7 +271,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection.CSVMenu
 
         private void back_btn_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new CurriculumPage(DepartmentId));
+            NavigationService.Navigate(new CurriculumMenu(DepartmentId));
         }
 
         private void save_btn_Click(object sender, RoutedEventArgs e)

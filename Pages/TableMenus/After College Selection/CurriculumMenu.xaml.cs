@@ -35,7 +35,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             DepartmentId = departmentId;
             LoadUI();
         }
-
+        //ui
         #region UI
 
         // Method to set up the TopBar
@@ -110,7 +110,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         #endregion
 
-
+        //datagrid
         #region Datagrid
         private void LoadCurriculum(string selectedStatus = "Active")
         {
@@ -202,7 +202,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
 
         #endregion
-
+        
+        //forms
         #region Forms
         private void curriculumDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

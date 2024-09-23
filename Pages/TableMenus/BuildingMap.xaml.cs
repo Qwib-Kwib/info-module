@@ -116,5 +116,11 @@ namespace Info_module.Pages.TableMenus
 			}
 
 		}
-	}
+
+        private void buildingMenu_btn_Click(object sender, RoutedEventArgs e)
+        {
+			NavigationService.Navigate(new BuildingMenu());
+
+        }
+    }
 }
