@@ -8,7 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Login">
 
-    <Grid Background="#FF001CB9">
+    <Grid Background="#FF22232B">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210"/>
             <ColumnDefinition/>
@@ -20,14 +20,14 @@
             <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
         <Viewbox Grid.Row="1" Grid.Column="1">
-            <Grid Height="126.323275862069" Width="364.723404255319">
+            <Grid Height="126" Width="415">
 
                 <Image Source="..\Images\CPU_LOGO.png" HorizontalAlignment="Left" Width="121"/>
-                <Viewbox Margin="128,16,0,63">
-                    <TextBlock TextWrapping="Wrap" Text="Central Philippines University" Width="155" Height="17" Foreground="White" d:IsLocked="True"/>
+                <Viewbox Margin="126,16,0,63">
+                    <TextBlock TextWrapping="Wrap" Text="Central Philippines University" Width="186" Height="17" FontFamily="Segoe UI Semibold"  Foreground="AntiqueWhite" FontSize="14" d:IsLocked="True"/>
                 </Viewbox>
-                <Viewbox Margin="128,58,0,20">
-                    <TextBlock TextWrapping="Wrap" Text="Information Module" Width="155" Height="17" Foreground="White" d:IsLocked="True"/>
+                <Viewbox Margin="126,58,0,20">
+                    <TextBlock TextWrapping="Wrap" Text="Information Module" Width="155" Height="17" FontFamily="Segoe UI Semibold" Foreground="AntiqueWhite" d:IsLocked="True"/>
                 </Viewbox>
             </Grid>
         </Viewbox>
@@ -46,9 +46,9 @@
                 <Grid Height="136" Width="150">
                     <TextBox x:Name="username_txt" HorizontalAlignment="Center" Margin="0,21,0,97" TextWrapping="Wrap" Width="150"/>
                     <PasswordBox x:Name="password_txt" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top" Width="150" Height="18"/>
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Foreground="White" Height="16" Width="59"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="0,53,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Foreground="White" Height="16" Width="50"/>
-                    <Button x:Name="login_btn" Content="Login" HorizontalAlignment="Center" Margin="0,116,0,0" VerticalAlignment="Top" Width="116" Click="login_btn_Click" Height="20"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Foreground="AntiqueWhite" Height="16" Width="59" FontFamily="C"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="0,53,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Foreground="AntiqueWhite" Height="16" Width="50"/>
+                    <Button x:Name="login_btn" Content="Login" HorizontalAlignment="Center" Margin="0,116,0,0" VerticalAlignment="Top" Width="116" Click="login_btn_Click" Height="20" Background="#FF6D6464" Foreground="White"/>
                 </Grid>
             </Viewbox>
         </Grid>
