@@ -24,7 +24,7 @@ namespace Info_module.Pages.Settings_Pages
     /// </summary>
     public partial class AddAccount : Page
     {
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         public AddAccount()
         {

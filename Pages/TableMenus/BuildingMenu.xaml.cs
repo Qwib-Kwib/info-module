@@ -29,7 +29,7 @@ namespace Info_module.Pages.TableMenus
             mainWindow.MainFrame.Navigate(new MainMenu());
         }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         private void LoadData(string statusFilter = "Active")
         {

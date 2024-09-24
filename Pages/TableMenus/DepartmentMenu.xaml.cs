@@ -38,7 +38,7 @@ namespace Info_module.Pages.TableMenus
             LoadDepartmentsData();
         }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         private void TopBar_BackButtonClicked(object sender, EventArgs e)
         {

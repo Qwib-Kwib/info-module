@@ -161,10 +161,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\TableMenus\After College Selection\CurriculumPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\TableMenus\After College Selection\InstructorMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -225,9 +221,6 @@
     </Compile>
     <Compile Include="Pages\TableMenus\After College Selection\CurriculumMenu.xaml.cs">
       <DependentUpon>CurriculumMenu.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\TableMenus\After College Selection\CurriculumPage.xaml.cs">
-      <DependentUpon>CurriculumPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\TableMenus\After College Selection\InstructorMenu.xaml.cs">
       <DependentUpon>InstructorMenu.xaml</DependentUpon>

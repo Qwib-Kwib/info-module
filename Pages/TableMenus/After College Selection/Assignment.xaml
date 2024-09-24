@@ -70,7 +70,7 @@
             <Viewbox Grid.Column="1" Stretch="Fill">
                 <Grid Height="299" Width="450">
                     <DataGrid  Margin="10,25,10,58" x:Name="schedule_data" Height="216"/>
-                    <Button Margin="188,264,188,10" Content="Assign" Height="25"/>
+                    <Button Margin="188,264,188,10" Content="Assign" Height="25" Click="Button_Click"/>
                     <TextBlock TextWrapping="Wrap" Text="Schedule" Margin="10,0,360,279"/>
 
                 </Grid>

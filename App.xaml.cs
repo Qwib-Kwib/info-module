@@ -13,5 +13,8 @@ namespace Info_module
     /// </summary>
     public partial class App : Application
     {
+        public static readonly string ConnectionString = @"Server=%;Database=universitydb;User ID=test;Password=;";
+
+
     }
 }

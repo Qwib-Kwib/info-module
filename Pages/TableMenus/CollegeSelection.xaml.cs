@@ -28,7 +28,7 @@ namespace Info_module.Pages.TableMenus
 
         private string SourceButton { get; set; }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         public List<(int DeptId, string DeptName, BitmapImage ImageSource)> GetDepartments()
         {

@@ -22,101 +22,116 @@
         <Frame x:Name="TopBarFrame" Content="" NavigationUIVisibility="Hidden" d:IsLocked="True"/>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="45*"/>
                 <RowDefinition Height="45*"/>
                 <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
+            <Grid x:Name="top_part">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="30*"/>
+                    <ColumnDefinition Width="30*"/>
+                    <ColumnDefinition Width="30*"/>
+                    <ColumnDefinition Width="5*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnMenuDepartment" Grid.Row="0" BorderBrush="#FFD2D2D2" Click="btnMenuDepartment_Click" Grid.Column="1" Margin="20,10,20,10">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
+                    </Button.Background>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30*"/>
+                            <RowDefinition Height="70*"/>
+                        </Grid.RowDefinitions>
+                        <Viewbox MaxHeight="80">
+                            <TextBlock TextWrapping="Wrap" Text="Department" Height="15"/>
+                        </Viewbox>
+                        <Image Source="/Images/mortarboard.png" Margin="35,10,35,10" Grid.Row="1"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="btnMenuBuilding" Grid.Row="0" Margin="20,10,20,10" BorderBrush="#FFD2D2D2" Click="btnMenuBuilding_Click" Grid.Column="2" >
+                    <Button.Background>
+                        <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
+                    </Button.Background>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30*"/>
+                            <RowDefinition Height="70*"/>
+                        </Grid.RowDefinitions>
+                        <Viewbox MaxHeight="80">
+                            <TextBlock TextWrapping="Wrap" Text="Building" Height="15" FontSize="11"/>
+                        </Viewbox>
+                        <Image Source="/Images/building.png" Margin="35,10,35,10" Grid.Row="1"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="btnMenuInstructor" Margin="18,10,20,10" BorderBrush="#FFD2D2D2" Click="btnMenuInstructor_Click" Grid.Column="3">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
+                    </Button.Background>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30*"/>
+                            <RowDefinition Height="70*"/>
+                        </Grid.RowDefinitions>
+                        <Viewbox MaxHeight="80">
+                            <TextBlock TextWrapping="Wrap" Text="Instructor" Height="15"/>
+                        </Viewbox>
+                        <Image Source="/Images/teacher.png" Margin="35,10,35,10" Grid.Row="1"/>
+                    </Grid>
+                </Button>
+            </Grid>
+            <Viewbox Grid.Row="1" Stretch="Fill">
+                <Grid Height="158" Width="800">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="Assignment_btn" Margin="10,10,10,10" BorderBrush="#FFD2D2D2" Click="Assignment_btn_Click" MaxWidth="350" Grid.Column="2">
+                        <Button.Background>
+                            <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
+                        </Button.Background>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30*"/>
+                                <RowDefinition Height="70*"/>
+                            </Grid.RowDefinitions>
+                            <Viewbox MaxHeight="80">
+                                <TextBlock TextWrapping="Wrap" Height="17"><Run Text="Assignment"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
+                            </Viewbox>
+                            <Image Source="/Images/resume.png" Margin="35,10,35,10" Grid.Row="1"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="btnMenuCurriculum" Margin="10,10,10,10" BorderBrush="#FFD2D2D2" Click="btnMenuCurriculum_Click" MaxWidth="350" Grid.Column="1">
+                        <Button.Background>
+                            <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
+                        </Button.Background>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30*"/>
+                                <RowDefinition Height="70*"/>
+                            </Grid.RowDefinitions>
+                            <Viewbox MaxHeight="80">
+                                <TextBlock TextWrapping="Wrap" Height="15"><Run Text="Curriculum"/><LineBreak/><Run/></TextBlock>
+                            </Viewbox>
+                            <Image Source="/Images/resume.png" Margin="35,10,35,10" Grid.Row="1"/>
+                        </Grid>
+                    </Button>
+                </Grid>
+            </Viewbox>
             <!--Buttons of Colleges, grid corresponding to 4x2, change images by Source=""-->
 
 
 
             <!--x0 y0-->
-            <Button x:Name="btnMenuDepartment" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10" BorderBrush="#FFD2D2D2" Click="btnMenuDepartment_Click">
-                <Button.Background>
-                    <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
-                </Button.Background>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Viewbox MaxHeight="80">
-                        <TextBlock TextWrapping="Wrap" Text="Department" Height="15"/>
-                    </Viewbox>
-                    <Image Source="/Images/mortarboard.png" Margin="35,10,35,10" Grid.Row="1"/>
-                </Grid>
-            </Button>
             <!--x0 y1-->
-            <Button x:Name="btnMenuBuilding" Grid.Column="2" Grid.Row="0" Margin="10,10,10,10" BorderBrush="#FFD2D2D2" Click="btnMenuBuilding_Click" >
-                <Button.Background>
-                    <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
-                </Button.Background>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Viewbox MaxHeight="80">
-                        <TextBlock TextWrapping="Wrap" Text="Building" Height="15" FontSize="11"/>
-                    </Viewbox>
-                    <Image Source="/Images/building.png" Margin="35,10,35,10" Grid.Row="1"/>
-                </Grid>
-            </Button>
             <!--x0 y2-->
-            <Button x:Name="btnMenuCurriculum" Grid.Column="1" Grid.Row="1" Margin="90,10,90,10" BorderBrush="#FFD2D2D2" Click="btnMenuCurriculum_Click" Grid.ColumnSpan="2" MaxWidth="350">
-                <Button.Background>
-                    <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
-                </Button.Background>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Viewbox MaxHeight="80">
-                        <TextBlock TextWrapping="Wrap" Height="15"><Run Text="Curriculum"/><LineBreak/><Run/></TextBlock>
-                    </Viewbox>
-                    <Image Source="/Images/resume.png" Margin="35,10,35,10" Grid.Row="1"/>
-                </Grid>
-            </Button>
-            <!--x1 y0-->
-            <Button x:Name="btnMenuInstructor" Grid.Column="3" Margin="10,10,10,10" BorderBrush="#FFD2D2D2" Click="btnMenuInstructor_Click">
-                <Button.Background>
-                    <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
-                </Button.Background>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Viewbox MaxHeight="80">
-                        <TextBlock TextWrapping="Wrap" Text="Instructor" Height="15"/>
-                    </Viewbox>
-                    <Image Source="/Images/teacher.png" Margin="35,10,35,10" Grid.Row="1"/>
-                </Grid>
-            </Button>
+            <!--x0 y2-->
             <!--x1 y1-->
-            <Button x:Name="Assignment_btn" Grid.Column="2" Grid.Row="1" Margin="90,10,90,10" BorderBrush="#FFD2D2D2" Click="Assignment_btn_Click" Grid.ColumnSpan="2" MaxWidth="350">
-                <Button.Background>
-                    <SolidColorBrush Color="#FF64646D" Opacity="0.8"/>
-                </Button.Background>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Viewbox MaxHeight="80">
-                        <TextBlock TextWrapping="Wrap" Height="17"><Run Text="Assignment"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
-                    </Viewbox>
-                    <Image Source="/Images/resume.png" Margin="35,10,35,10" Grid.Row="1"/>
-                </Grid>
-            </Button>
         </Grid>
 
 

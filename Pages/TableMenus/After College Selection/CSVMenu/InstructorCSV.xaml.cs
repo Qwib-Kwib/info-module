@@ -29,7 +29,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection.CSVMenu
         private string departmentCode;
         private string departmentName;
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
         public InstructorCSV(int departmentId)
         {
             InitializeComponent();

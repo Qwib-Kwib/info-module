@@ -25,8 +25,9 @@ namespace Info_module.Pages.TableMenus
     {
 
         public int DepartmentId { get; set; }
+        public int EmployeeId { get; set; } 
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         public Assignment()
         {
@@ -106,7 +107,9 @@ namespace Info_module.Pages.TableMenus
             
             if (instructor_data.SelectedItem is DataRowView selectedRow)
             {
-                LoadInstructorSubjects((int)selectedRow["Internal_Employee_Id"]);
+                EmployeeId = (int)selectedRow["Internal_Employee_Id"];
+
+                LoadInstructorSubjects(EmployeeId);
             }
         }
 
@@ -140,8 +143,12 @@ namespace Info_module.Pages.TableMenus
         }
 
 
+
         #endregion
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 }

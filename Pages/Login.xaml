@@ -24,10 +24,10 @@
 
                 <Image Source="..\Images\CPU_LOGO.png" HorizontalAlignment="Left" Width="121"/>
                 <Viewbox Margin="126,16,0,63">
-                    <TextBlock TextWrapping="Wrap" Text="Central Philippines University" Width="186" Height="17" FontFamily="Segoe UI Semibold"  Foreground="AntiqueWhite" FontSize="14" d:IsLocked="True"/>
+                    <TextBlock TextWrapping="Wrap" Text="Central Philippine University" Width="186" Height="17" FontFamily="Palatino Linotype"  Foreground="AntiqueWhite" FontSize="14"/>
                 </Viewbox>
                 <Viewbox Margin="126,58,0,20">
-                    <TextBlock TextWrapping="Wrap" Text="Information Module" Width="155" Height="17" FontFamily="Segoe UI Semibold" Foreground="AntiqueWhite" d:IsLocked="True"/>
+                    <TextBlock TextWrapping="Wrap" Text="Course Information Module" Width="155" Height="17" FontFamily="Palatino Linotype" Foreground="AntiqueWhite"/>
                 </Viewbox>
             </Grid>
         </Viewbox>

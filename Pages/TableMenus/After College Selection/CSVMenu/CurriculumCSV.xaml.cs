@@ -32,7 +32,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection.CSVMenu
         public int DepartmentId { get; set; }
         public int CurriculumId { get; set; }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
 
         public CurriculumCSV(int departmentId, int curriculumId)

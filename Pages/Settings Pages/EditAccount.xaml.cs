@@ -27,7 +27,7 @@ namespace Info_module.Pages.Settings_Pages
             InitializeComponent();
         }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
         private string HashPassword(string password)
         {

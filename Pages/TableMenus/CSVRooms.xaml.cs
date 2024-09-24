@@ -53,7 +53,7 @@ namespace Info_module.Pages.TableMenus
 
         }
 
-		private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+		string connectionString = App.ConnectionString;
 
         private void LoadBuildingDetails() //change text block
         {

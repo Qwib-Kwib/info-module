@@ -25,8 +25,9 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
     public partial class CurriculumMenu : Page
     {
         public int DepartmentId { get; set; }
+        public string CurriculumStatus { get; set; }
 
-        private const string connectionString = @"Server=localhost;Database=universitydb;User ID=root;Password=;";
+        string connectionString = App.ConnectionString;
 
 
         public CurriculumMenu(int departmentId)
@@ -212,6 +213,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 curriculumId_txt.Text = selectedRow["Curriculum_Id"].ToString();
                 curriculumRevision_txt.Text = selectedRow["Curriculum_Revision"].ToString();
                 curriculumDescription_txt.Text = selectedRow["Curriculum_Description"].ToString();
+                CurriculumStatus = selectedRow["status"].ToString();
 
                 // Split the "Year_Effective" column if it contains the combined year range
                 string yearEffective = selectedRow["Year_Effective"].ToString();
@@ -334,16 +336,11 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         private void CurriculumStatus_btn_Click(object sender, RoutedEventArgs e)
         {
-            // Check if the Curriculum_Id textbox is empty
-            if (string.IsNullOrWhiteSpace(curriculumId_txt.Text))
+            // Check if the Curriculum ID is valid
+            int curriculumId;
+            if (!int.TryParse(curriculumId_txt.Text, out curriculumId))
             {
-                MessageBox.Show("Please enter a Curriculum ID.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (!int.TryParse(curriculumId_txt.Text, out int curriculumId))
-            {
-                MessageBox.Show("Invalid Curriculum ID.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please enter a valid Curriculum ID.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -352,50 +349,35 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
+                    string query = @"UPDATE curriculum 
+                             SET Status = @Status
+                             Where Curriculum_Id = @Curriculum_Id";
 
-                    // Query to get the current status of the curriculum
-                    string selectQuery = "SELECT Status FROM curriculum WHERE Curriculum_Id = @Curriculum_Id";
-
-                    using (MySqlCommand selectCommand = new MySqlCommand(selectQuery, connection))
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        selectCommand.Parameters.AddWithValue("@Curriculum_Id", curriculumId);
-
-                        object result = selectCommand.ExecuteScalar();
-
-                        if (result != null && int.TryParse(result.ToString(), out int currentStatus))
+                        command.Parameters.AddWithValue("@Curriculum_Id", curriculumId);
+                        if (CurriculumStatus == "Active")
                         {
-                            // Determine the new status (toggle)
-                            int newStatus = currentStatus == 0 ? 1 : 0;
-                            string statusText = newStatus == 0 ? "Inactive" : "Active";
-
-                            // Update query to set the new Status
-                            string updateQuery = "UPDATE curriculum SET Status = @NewStatus WHERE Curriculum_Id = @Curriculum_Id";
-
-                            using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
-                            {
-                                updateCommand.Parameters.AddWithValue("@NewStatus", newStatus);
-                                updateCommand.Parameters.AddWithValue("@Curriculum_Id", curriculumId);
-
-                                int rowsAffected = updateCommand.ExecuteNonQuery();
-
-                                if (rowsAffected > 0)
-                                {
-                                    // Optionally update the DataGrid or refresh data
-                                    LoadCurriculum();
-                                    ClearTextboxes();
-                                    MessageBox.Show($"Curriculum status updated to {statusText} successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Curriculum ID not found.", "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                                }
-                            }
+                            command.Parameters.AddWithValue("@Status", 0);
+                        }
+                        else if (CurriculumStatus == "Inactive")
+                        {
+                            command.Parameters.AddWithValue("@Status", 1);
+                        }
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            // Refresh the DataGrid
+                            LoadCurriculum();
+                            ClearTextboxes();
+                            MessageBox.Show("Status Switched successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                         else
                         {
-                            MessageBox.Show("Curriculum ID not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show("No curriculum found with the specified ID.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
+
                 }
             }
             catch (MySqlException ex)
@@ -403,6 +385,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 MessageBox.Show("Error updating curriculum status: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
 
         private void subject_btn_Click(object sender, RoutedEventArgs e)
         {
