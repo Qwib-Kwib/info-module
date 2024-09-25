@@ -28,35 +28,32 @@ namespace Info_module.Pages.TableMenus
         private int buildingId;
         private string buildingCode;
         private string buildingName;
-
         private int selectedRoomId;
         private string selectedBuildingCode;
         private string selectedRoomCode;
         private int selectedFloorLevel;
         private string selectedRoomType;
         private int selectedMaxSeat;
-        private int selectedAvailability;
+        private int selectedStatus;
 
         public CSVRooms(int buildingId)
         {
+
             InitializeComponent();
+            this.buildingId = buildingId;
+            LoadUI();
+        }
+
+        string connectionString = App.ConnectionString;
+
+        #region UI
+        private void LoadUI()
+        {
             TopBar topBar = new TopBar();
             topBar.txtPageTitle.Text = "Configure Room";
             topBar.Visibility = Visibility.Visible;
             topBar.BackButtonClicked += TopBar_BackButtonClicked;
             TopBarFrame.Navigate(topBar);
-
-            this.buildingId = buildingId;
-            LoadBuildingDetails();
-            LoadBuilding();
-
-
-        }
-
-		string connectionString = App.ConnectionString;
-
-        private void LoadBuildingDetails() //change text block
-        {
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -71,6 +68,7 @@ namespace Info_module.Pages.TableMenus
                         {
                             buildingCode = reader["Building_Code"].ToString();
                             buildingName = reader["Building_Name"].ToString();
+                            
                         }
                     }
                 }
@@ -80,35 +78,111 @@ namespace Info_module.Pages.TableMenus
                 MessageBox.Show("Error loading building details: " + ex.Message);
             }
 
-            buildingCode_txtblck.Text = buildingCode;
             buildingName_txtblck.Text = buildingName;
+            LoadBuilding();
+            //string what = buildingCode;
+            //test_txt.Text = what;
         }
 
-        private void LoadBuilding()
+        private void TopBar_BackButtonClicked(object sender, EventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new BuildingMap());
+        }
+
+        private void back_btn_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+
+        }
+        #endregion
+
+        #region DATA GRID
+
+        private void room_data_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+            if (room_data.SelectedItem is DataRowView selectedRow)
+            {
+                selectedRoomId = Convert.ToInt32(selectedRow["Room_Id"]);
+                selectedBuildingCode = selectedRow["Building_Code"].ToString();
+                selectedRoomCode = selectedRow["Room_Code"].ToString();
+                selectedFloorLevel = Convert.ToInt32(selectedRow["Floor_Level"]);
+                selectedRoomType = selectedRow["Room_Type"].ToString();
+                selectedMaxSeat = Convert.ToInt32(selectedRow["Max_Seat"]);
+                if (selectedRow["Status"].ToString() == "Active")
+                {
+                    selectedStatus = 1;
+                }
+                else if (selectedRow["Status"].ToString() == "Inactive")
+                {
+                    selectedStatus = 0;
+                }
+
+
+                roomId_txt.Text = selectedRoomId.ToString();
+                buildingCode_txt.Text = selectedBuildingCode.ToString();
+                roomCode_txt.Text = selectedRoomCode.ToString();
+                roomFloor_txt.Text = selectedFloorLevel.ToString();
+                foreach (ComboBoxItem item in roomType_cmbx.Items)
+                {
+                    if (item.Content.ToString() == selectedRoomType)
+                    {
+                        roomType_cmbx.SelectedItem = item;
+                        break;
+                    }
+                }
+                maxSeat_txt.Text = selectedMaxSeat.ToString();
+
+            }
+        }
+
+        private void LoadBuilding(string statusFilter = "Active")
         {
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = @"SELECT 
-                                Room_Id AS Room_Id, 
-                                @BuildingCode AS Building_Code, 
-                                Room_Code, 
-                                Room_Floor AS Floor_Level, 
-                                Room_Type,  
-                                Max_Seat, 
-                                status AS Availability 
-                             FROM rooms 
-                             WHERE Building_Id = @BuildingId";
+
+                    string query = @"
+                SELECT 
+                    Room_Id AS 'Room_Id', 
+                    Room_Code, 
+                    Room_Floor AS 'Floor_Level', 
+                    Room_Type,  
+                    Max_Seat, 
+                    CASE 
+                        WHEN status = 1 THEN 'Active' 
+                        ELSE 'Inactive' 
+                    END AS 'Status'
+                FROM rooms
+                WHERE Building_Id = @BuildingId";
+
+                    // Modify the query based on the status filter
+                    if (statusFilter == "Active")
+                    {
+                        query += " AND status = 1";
+                    }
+                    else if (statusFilter == "Inactive")
+                    {
+                        query += " AND status = 0";
+                    }
+
                     MySqlCommand command = new MySqlCommand(query, connection);
                     command.Parameters.AddWithValue("@BuildingId", buildingId);
-                    command.Parameters.AddWithValue("@BuildingCode", buildingCode);
 
                     DataTable dataTable = new DataTable();
                     using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                     {
                         adapter.Fill(dataTable);
+                    }
+
+                    // Add the Building_Code column and set its value for each row
+                    dataTable.Columns.Add("Building_Code", typeof(string));
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        row["Building_Code"] = buildingCode; // Make sure buildingCode is set correctly
                     }
 
                     room_data.ItemsSource = dataTable.DefaultView;
@@ -117,6 +191,266 @@ namespace Info_module.Pages.TableMenus
             catch (MySqlException ex)
             {
                 MessageBox.Show("Error retrieving data: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+        private void Status_cmb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Status_cmb.SelectedItem != null)
+            {
+                ComboBoxItem selectedItem = (ComboBoxItem)Status_cmb.SelectedItem;
+                string selectedStatus = selectedItem.Content.ToString();
+
+                // Pass the selected status to filter the data
+                LoadBuilding(selectedStatus);
+
+                // Change button content based on the selected status
+                if (selectedStatus == "Active")
+                {
+                    statusRoom_btn.Content = "Deactivate"; // For active departments
+                    statusRoom_btn.FontSize = 11;
+                }
+                else if (selectedStatus == "Inactive")
+                {
+                    statusRoom_btn.Content = "Activate"; // For inactive departments
+                    statusRoom_btn.FontSize = 12;
+                }
+                else
+                {
+                    statusRoom_btn.Content = "Switch Status"; // Default text for "All"
+                    statusRoom_btn.FontSize = 10;
+                }
+            }
+
+        }
+
+
+
+
+        #endregion
+
+        #region FORMS
+
+
+        private void roomFloor_txt_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = App.IsTextNumeric(e.Text);
+        }
+
+        private void maxSeat_txt_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = App.IsTextNumeric(e.Text);
+        }
+
+        private void addRoom_btn_Click(object sender, RoutedEventArgs e)
+        {
+            // Validation: Check if all relevant forms are filled
+            if (string.IsNullOrWhiteSpace(roomCode_txt.Text) ||
+                string.IsNullOrWhiteSpace(roomFloor_txt.Text) ||
+                roomType_cmbx.SelectedItem == null ||
+                string.IsNullOrWhiteSpace(maxSeat_txt.Text))
+            {
+                MessageBox.Show("Please fill out all fields before adding a room.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Stop execution if validation fails
+            }
+
+            // Additional validation for numeric inputs
+            if (!int.TryParse(roomFloor_txt.Text, out int roomFloor) || !int.TryParse(maxSeat_txt.Text, out int maxSeat))
+            {
+                MessageBox.Show("Room Floor and Max Seat must be valid numbers.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = @"INSERT INTO rooms (Building_Id, Room_Code, Room_Floor, Room_Type, Max_Seat) 
+                             VALUES (@Building_Id, @Room_Code, @Room_Floor, @Room_Type, @Max_Seat)";
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Building_Id", buildingId);
+                        command.Parameters.AddWithValue("@Room_Code", roomCode_txt.Text);
+                        command.Parameters.AddWithValue("@Room_Floor", roomFloor);
+                        command.Parameters.AddWithValue("@Room_Type", (roomType_cmbx.SelectedItem as ComboBoxItem)?.Content.ToString()); // Get room type text
+                        command.Parameters.AddWithValue("@Max_Seat", maxSeat);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                LoadBuilding();
+                MessageBox.Show("Room added successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Error adding Room: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void updateRoom_btn_Click(object sender, RoutedEventArgs e)
+        {
+            // Validation: Check if all relevant forms are filled
+            if (string.IsNullOrWhiteSpace(roomCode_txt.Text) ||
+                string.IsNullOrWhiteSpace(roomFloor_txt.Text) ||
+                roomType_cmbx.SelectedItem == null ||
+                string.IsNullOrWhiteSpace(maxSeat_txt.Text))
+            {
+                MessageBox.Show("Please fill out all fields before adding a room.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Stop execution if validation fails
+            }
+
+            // Additional validation for numeric inputs
+            if (!int.TryParse(roomFloor_txt.Text, out int roomFloor) || !int.TryParse(maxSeat_txt.Text, out int maxSeat))
+            {
+                MessageBox.Show("Room Floor and Max Seat must be valid numbers.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                    UPDATE rooms
+                    SET Room_Code = @Room_Code, 
+                        Room_Floor = @Room_Floor, 
+                        Room_Type = @Room_Type,
+                        Max_Seat = @Max_Seat                   
+                    WHERE Room_Id = @Room_Id";
+
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Room_Id", Convert.ToInt32(roomId_txt.Text));
+                        command.Parameters.AddWithValue("@Room_Code", roomCode_txt.Text);
+                        command.Parameters.AddWithValue("@Room_Floor", roomFloor);
+                        command.Parameters.AddWithValue("@Room_Type", (roomType_cmbx.SelectedItem as ComboBoxItem)?.Content.ToString()); // Updated Room Type
+                        command.Parameters.AddWithValue("@Max_Seat", maxSeat);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                LoadBuilding();
+                MessageBox.Show("Room updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Error updating Room: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }
+
+        private void clear_btn_Click(object sender, RoutedEventArgs e)
+        {
+            roomId_txt.Clear();
+            buildingCode_txt.Clear();
+            roomFloor_txt.Clear();
+            roomCode_txt.Clear();
+            roomType_cmbx.SelectedIndex = -1;
+            maxSeat_txt.Clear();
+
+        }
+
+        private void switchCsv_click(object sender, RoutedEventArgs e)
+        {
+            roomForm_grid.Visibility = Visibility.Hidden;
+            roomCsv_grid.Visibility = Visibility.Visible;
+            roomCsv_grid.Margin = new Thickness(10, 10, 10, 9);
+
+        }
+
+        private void statusRoom_btn_Click(object sender, RoutedEventArgs e)
+        {
+            if (room_data.SelectedItems.Count > 0)
+            {
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        foreach (DataRowView rowView in room_data.SelectedItems)
+                        {
+                            DataRow row = rowView.Row;
+                            int roomId = selectedRoomId;
+                            int currentStatus = 0;
+                            if (row["Status"].ToString() == "Active")
+                            {
+                                currentStatus = 1;
+                            }
+                            else if (row["Status"].ToString() == "Inactive")
+                            {
+                                currentStatus = 0;
+                            }
+
+                            int newStatus = (currentStatus == 1) ? 0 : 1;
+
+                            string query = "UPDATE rooms SET status = @Status WHERE Room_Id = @RoomId";
+                            using (MySqlCommand command = new MySqlCommand(query, connection))
+                            {
+                                command.Parameters.AddWithValue("@Status", newStatus);
+                                command.Parameters.AddWithValue("@RoomId", roomId);
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    MessageBox.Show("Status updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoadBuilding(); // Refresh data after updating status
+                }
+                catch (MySqlException ex)
+                {
+                    MessageBox.Show("Error updating status: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select at least one entry to update status.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        #endregion
+
+        #region CSV
+
+        private void switchForm_btn_Click(object sender, RoutedEventArgs e)
+        {
+            roomForm_grid.Visibility = Visibility.Visible;
+            roomCsv_grid.Visibility = Visibility.Hidden;
+            roomCsv_grid.Margin = new Thickness(-185, 10, 205, 10);
+        }
+
+        private void InsertDataIntoDatabase(DataTable dataTable)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        // Only insert rows that have not already been inserted
+                        if (row.RowState == DataRowState.Added)
+                        {
+                            string query = "INSERT INTO rooms (Building_Id, Room_Code, Room_Floor, Room_Type, Max_Seat, status) " +
+                                           "VALUES (@Building_Id, @Room_Code, @Room_Floor, @Room_Type, @Max_Seat, @status)";
+                            using (MySqlCommand command = new MySqlCommand(query, connection))
+                            {
+                                command.Parameters.AddWithValue("@Building_Id", buildingId);
+                                command.Parameters.AddWithValue("@Room_Code", row["Room_Code"]);
+                                command.Parameters.AddWithValue("@Room_Floor", row["Floor_Level"]);
+                                command.Parameters.AddWithValue("@Room_Type", row["Room_Type"]);
+                                command.Parameters.AddWithValue("@Max_Seat", row["Max_Seat"]);
+                                command.Parameters.AddWithValue("@status", row["Status"]);
+
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+                MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Error inserting data into database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -146,7 +480,6 @@ namespace Info_module.Pages.TableMenus
             }
         }
 
-
         private DataTable ReadCsvFile(string filePath)
         {
             DataTable csvData = new DataTable();
@@ -159,7 +492,7 @@ namespace Info_module.Pages.TableMenus
                     csvData.Columns.Add("Floor_Level", typeof(int));
                     csvData.Columns.Add("Room_Type", typeof(string));
                     csvData.Columns.Add("Max_Seat", typeof(int));
-                    csvData.Columns.Add("Availability", typeof(int));
+                    csvData.Columns.Add("Status", typeof(int));
 
                     // Read the header line first to skip it
                     sr.ReadLine();
@@ -183,7 +516,7 @@ namespace Info_module.Pages.TableMenus
                             dr["Floor_Level"] = int.Parse(rows[1].Trim());
                             dr["Room_Type"] = rows[2].Trim();
                             dr["Max_Seat"] = int.Parse(rows[4].Trim());
-                            dr["Availability"] = int.Parse(rows[5].Trim());
+                            dr["Status"] = int.Parse(rows[5].Trim());
 
                             csvData.Rows.Add(dr);
                         }
@@ -200,25 +533,7 @@ namespace Info_module.Pages.TableMenus
                 MessageBox.Show("Error reading CSV file: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
-
             return csvData;
-        }
-
-
-
-
-
-
-
-        private void TopBar_BackButtonClicked(object sender, EventArgs e)
-        {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new BuildingMap());
-        }
-
-        private void back_btn_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.GoBack();
         }
 
         private void Add_btn_Click(object sender, RoutedEventArgs e)
@@ -234,163 +549,13 @@ namespace Info_module.Pages.TableMenus
             InsertDataIntoDatabase(dataTable);
         }
 
-        private void InsertDataIntoDatabase(DataTable dataTable)
-        {
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        // Only insert rows that have not already been inserted
-                        if (row.RowState == DataRowState.Added)
-                        {
-                            string query = "INSERT INTO rooms (Building_Id, Room_Code, Room_Floor, Room_Type, Max_Seat, status) " +
-                                           "VALUES (@Building_Id, @Room_Code, @Room_Floor, @Room_Type, @Max_Seat, @status)";
-                            using (MySqlCommand command = new MySqlCommand(query, connection))
-                            {
-                                command.Parameters.AddWithValue("@Building_Id", buildingId);
-                                command.Parameters.AddWithValue("@Room_Code", row["Room_Code"]);
-                                command.Parameters.AddWithValue("@Room_Floor", row["Floor_Level"]);
-                                command.Parameters.AddWithValue("@Room_Type", row["Room_Type"]);
-                                command.Parameters.AddWithValue("@Max_Seat", row["Max_Seat"]);
-                                command.Parameters.AddWithValue("@status", row["Availability"]);
-
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                }
-                MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show("Error inserting data into database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
 
 
 
-        private void Remove_btn_Click(object sender, RoutedEventArgs e)
-        {
-            if (room_data.SelectedItems.Count > 0)
-            {
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        connection.Open();
-                        List<DataRowView> rowsToRemove = new List<DataRowView>();
 
-                        foreach (DataRowView rowView in room_data.SelectedItems)
-                        {
-                            DataRow row = rowView.Row;
-                            int roomId = Convert.ToInt32(row["ID"]);
+        #endregion
 
-                            if (roomId != -1) // Assuming -1 means it's not in the database
-                            {
-                                string query = "DELETE FROM rooms WHERE Room_Id = @RoomId";
-                                using (MySqlCommand command = new MySqlCommand(query, connection))
-                                {
-                                    command.Parameters.AddWithValue("@RoomId", roomId);
-                                    command.ExecuteNonQuery();
-                                }
-                            }
-
-                            // Add row to list of rows to remove
-                            rowsToRemove.Add(rowView);
-                        }
-
-                        // Remove rows from DataGrid
-                        foreach (DataRowView rowView in rowsToRemove)
-                        {
-                            (room_data.ItemsSource as DataView).Table.Rows.Remove(rowView.Row);
-                        }
-                    }
-                    MessageBox.Show("Selected entries deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("Error deleting selected entries: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select at least one entry to delete.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-        }
-
-        private void ViewData_btn_Click(object sender, RoutedEventArgs e)
-        {
-            LoadBuilding();
-
-        }
-
-
-
-        private void Status_btn_Click(object sender, RoutedEventArgs e)
-        {
-            if (room_data.SelectedItems.Count > 0)
-            {
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        connection.Open();
-                        foreach (DataRowView rowView in room_data.SelectedItems)
-                        {
-                            DataRow row = rowView.Row;
-                            int roomId = selectedRoomId;
-                            int currentStatus = Convert.ToInt32(row["Availability"]);
-
-                            int newStatus = (currentStatus == 1) ? 0 : 1;
-
-                            string query = "UPDATE rooms SET status = @Status WHERE Room_Id = @RoomId";
-                            using (MySqlCommand command = new MySqlCommand(query, connection))
-                            {
-                                command.Parameters.AddWithValue("@Status", newStatus);
-                                command.Parameters.AddWithValue("@RoomId", roomId);
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    MessageBox.Show("Status updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    ViewData_btn_Click(sender, e); // Refresh data after updating status
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("Error updating status: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select at least one entry to update status.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-
-        }
-
-        private void room_data_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (room_data.SelectedItem is DataRowView selectedRow)
-            {
-                selectedRoomId = Convert.ToInt32(selectedRow["Room_Id"]);
-                selectedBuildingCode = selectedRow["Building_Code"].ToString();
-                selectedRoomCode = selectedRow["Room_Code"].ToString();
-                selectedFloorLevel = Convert.ToInt32(selectedRow["Floor_Level"]);
-                selectedRoomType = selectedRow["Room_Type"].ToString();
-                selectedMaxSeat = Convert.ToInt32(selectedRow["Max_Seat"]);
-                selectedAvailability = Convert.ToInt32(selectedRow["Availability"]);
-
-                
-                // roomCodeTextBox.Text = selectedRoomCode;
-                // floorLevelTextBox.Text = selectedFloorLevel.ToString();
-                // roomTypeTextBox.Text = selectedRoomType;
-                // airConditionedTextBox.Text = selectedAirConditioned;
-                // maxSeatTextBox.Text = selectedMaxSeat.ToString();
-                // availabilityTextBox.Text = selectedAvailability.ToString();
-            }
-        }
+        
     }
 
 }

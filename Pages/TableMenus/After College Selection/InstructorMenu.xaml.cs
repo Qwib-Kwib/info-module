@@ -297,7 +297,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
                 // Load related data
                 LoadInstructorSubjects(InternalEmployeeId);
-                LoadAvailability(InternalEmployeeId);
+                LoadStatus(InternalEmployeeId);
             }
         }
 
@@ -650,12 +650,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         private void Quantity_txtbx_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = IsTextNumeric(e.Text);
-        }
-
-        private static bool IsTextNumeric(string str)
-        {
-            return System.Text.RegularExpressions.Regex.IsMatch(str, "[^0-9]");
+            e.Handled = App.IsTextNumeric(e.Text);
         }
 
         private void instrutorSubject_data_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -726,9 +721,9 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
 
         #endregion
 
-        //   Availability   /////////////////////////
-        #region Availability
-        private void LoadAvailability(int entityId)
+        //   Status   /////////////////////////
+        #region Status
+        private void LoadStatus(int entityId)
         {
             try
             {
@@ -736,8 +731,8 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     connection.Open();
                     string query = @"
-                SELECT Availability_Id, Day_Of_Week, Start_Time, End_Time
-                FROM instructor_availability
+                SELECT Status_Id, Day_Of_Week, Start_Time, End_Time
+                FROM instructor_Status
                 WHERE Internal_Employee_Id = @entityId";
 
                     MySqlCommand command = new MySqlCommand(query, connection);
@@ -756,7 +751,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show("Error loading availability: " + ex.Message);
+                MessageBox.Show("Error loading Status: " + ex.Message);
             }
         }
 
@@ -781,7 +776,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             return arrangedTable;
         }
 
-        private void availabilityAdd_btn_Click(object sender, RoutedEventArgs e)
+        private void StatusAdd_btn_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -811,10 +806,10 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     return;
                 }
 
-                // Check if availability already exists for the selected day and instructor
-                if (IsAvailabilityExists(instructorId, dayOfWeek))
+                // Check if Status already exists for the selected day and instructor
+                if (IsStatusExists(instructorId, dayOfWeek))
                 {
-                    MessageBox.Show($"Availability already exists for {dayOfWeek}.", "Duplicate Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Status already exists for {dayOfWeek}.", "Duplicate Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -823,7 +818,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     connection.Open();
                     string query = @"
-                INSERT INTO instructor_availability (Internal_Employee_Id, Day_Of_Week, Start_Time, End_Time)
+                INSERT INTO instructor_Status (Internal_Employee_Id, Day_Of_Week, Start_Time, End_Time)
                 VALUES (@instructorId, @dayOfWeek, @startTime, @endTime)";
 
                     MySqlCommand command = new MySqlCommand(query, connection);
@@ -835,14 +830,14 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     command.ExecuteNonQuery();
                 }
 
-                // Optionally, reload the availability data in the DataGrid after adding
-                LoadAvailability(instructorId); // Refresh the availability DataGrid
+                // Optionally, reload the Status data in the DataGrid after adding
+                LoadStatus(instructorId); // Refresh the Status DataGrid
 
-                MessageBox.Show("Availability added successfully.");
+                MessageBox.Show("Status added successfully.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error adding availability: " + ex.Message);
+                MessageBox.Show("Error adding Status: " + ex.Message);
             }
         }
 
@@ -853,7 +848,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             return startTime < endTime;
         }
 
-        private bool IsAvailabilityExists(int instructorId, string dayOfWeek)
+        private bool IsStatusExists(int instructorId, string dayOfWeek)
         {
             bool exists = false;
 
@@ -864,7 +859,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                     connection.Open();
                     string query = @"
                 SELECT COUNT(*)
-                FROM instructor_availability
+                FROM instructor_Status
                 WHERE Internal_Employee_Id = @instructorId
                 AND Day_Of_Week = @dayOfWeek";
 
@@ -881,7 +876,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show("Error checking availability: " + ex.Message);
+                MessageBox.Show("Error checking Status: " + ex.Message);
             }
 
             return exists;
@@ -912,7 +907,7 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
             return null;
         }
 
-        private void availabilityDelete_btn_Click(object sender, RoutedEventArgs e)
+        private void StatusDelete_btn_Click(object sender, RoutedEventArgs e)
         {
             if (availability_data.SelectedItem != null)
             {
@@ -920,33 +915,33 @@ namespace Info_module.Pages.TableMenus.After_College_Selection
                 {
                     DataRowView row = (DataRowView)availability_data.SelectedItem;
 
-                    // Retrieve the selected availability ID
-                    int availabilityId = Convert.ToInt32(row["Availability_Id"]);
+                    // Retrieve the selected Status ID
+                    int StatusId = Convert.ToInt32(row["Status_Id"]);
 
                     // Delete from the database
                     using (MySqlConnection connection = new MySqlConnection(connectionString))
                     {
                         connection.Open();
-                        string query = "DELETE FROM instructor_availability WHERE Availability_Id = @availabilityId";
+                        string query = "DELETE FROM instructor_Status WHERE Status_Id = @StatusId";
                         MySqlCommand command = new MySqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@availabilityId", availabilityId);
+                        command.Parameters.AddWithValue("@StatusId", StatusId);
                         command.ExecuteNonQuery();
                     }
 
                     // Refresh the DataGrid after deletion
                     int instructorId = Convert.ToInt32(employeeId_txt.Text);
-                    LoadAvailability(instructorId); // Refresh availability DataGrid
+                    LoadStatus(instructorId); // Refresh Status DataGrid
 
-                    MessageBox.Show("Availability deleted successfully.");
+                    MessageBox.Show("Status deleted successfully.");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error deleting availability: " + ex.Message);
+                    MessageBox.Show("Error deleting Status: " + ex.Message);
                 }
             }
             else
             {
-                MessageBox.Show("Please select an availability record to delete.");
+                MessageBox.Show("Please select an Status record to delete.");
             }
         }
 

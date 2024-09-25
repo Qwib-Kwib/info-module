@@ -100,14 +100,14 @@
                             <Viewbox Margin="10,5,11,10" Grid.ColumnSpan="2" Grid.Row="1" Stretch="Fill">
                                 <DataGrid x:Name="availability_data" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Height="176" Width="531">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="ID" IsReadOnly="True" Binding="{Binding Availability_Id}" Visibility="Hidden"/>
+                                        <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="ID" IsReadOnly="True" Binding="{Binding Status_Id}" Visibility="Hidden"/>
                                         <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Day of Week" IsReadOnly="True" Binding="{Binding Day_Of_Week}"/>
                                         <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="Start Time" IsReadOnly="True" Binding="{Binding Start_Time}"/>
                                         <DataGridTextColumn CanUserResize="False" CanUserReorder="False" Header="End Time" IsReadOnly="True" Binding="{Binding End_Time}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Viewbox>
-                            <TextBlock Margin="10,2,220,2" TextWrapping="Wrap" Text="Instructor Availability" FontSize="14" Grid.ColumnSpan="2"/>
+                            <TextBlock Margin="10,2,220,2" TextWrapping="Wrap" Text="Instructor Status" FontSize="14" Grid.ColumnSpan="2"/>
                             <Grid Grid.Column="1" Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="3*"/>
@@ -135,8 +135,8 @@
                                         <RowDefinition Height="29*"/>
                                         <RowDefinition Height="5*"/>
                                     </Grid.RowDefinitions>
-                                    <Button x:Name="availabilityAdd_btn" Content="Add" Margin="18,5,18,5" Grid.Row="1" Click="availabilityAdd_btn_Click"/>
-                                    <Button x:Name="availabilityDelete_btn" Margin="18,5,18,5" Content="Delete" Grid.Row="2" Click="availabilityDelete_btn_Click"/>
+                                    <Button x:Name="StatusAdd_btn" Content="Add" Margin="18,5,18,5" Grid.Row="1" Click="StatusAdd_btn_Click"/>
+                                    <Button x:Name="StatusDelete_btn" Margin="18,5,18,5" Content="Delete" Grid.Row="2" Click="StatusDelete_btn_Click"/>
                                 </Grid>
                             </Grid>
                         </Grid>

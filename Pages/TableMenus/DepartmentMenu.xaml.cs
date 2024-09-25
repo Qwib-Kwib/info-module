@@ -53,19 +53,20 @@ namespace Info_module.Pages.TableMenus
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
+
                     string query = @"
-            SELECT 
-                d.Dept_Id AS 'Department_ID',
-                d.Building_Id,
-                b.Building_Code AS 'Building_Code',
-                d.Dept_Code AS 'Department_Code',
-                d.Dept_Name AS 'Department_Name',
-                CASE 
-                    WHEN d.Status = 1 THEN 'Active'
-                    ELSE 'Inactive'
-                END AS 'Status'
-            FROM departments d
-            INNER JOIN buildings b ON d.Building_Id = b.Building_Id";
+                SELECT 
+                    d.Dept_Id AS 'Department_ID',
+                    d.Building_Id,
+                    b.Building_Code AS 'Building_Code',
+                    d.Dept_Code AS 'Department_Code',
+                    d.Dept_Name AS 'Department_Name',
+                    CASE 
+                        WHEN d.Status = 1 THEN 'Active'
+                        ELSE 'Inactive'
+                    END AS 'Status'
+                FROM departments d
+                INNER JOIN buildings b ON d.Building_Id = b.Building_Id";
 
                     // Apply filter based on the status
                     if (statusFilter == "Active")
@@ -76,7 +77,7 @@ namespace Info_module.Pages.TableMenus
                     {
                         query += " WHERE d.Status = 0";
                     }
-                    // Otherwise, do not add a WHERE clause to show all
+                    // No WHERE clause for "All" to show all departments
 
                     MySqlCommand command = new MySqlCommand(query, connection);
 
@@ -94,6 +95,7 @@ namespace Info_module.Pages.TableMenus
                 MessageBox.Show("Error retrieving data: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private void Status_cmb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
