@@ -317,8 +317,5 @@
   <ItemGroup>
     <Resource Include="Images\Campus-Map.jpg" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="universitydb.sql" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
